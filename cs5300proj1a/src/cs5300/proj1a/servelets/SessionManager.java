@@ -152,6 +152,9 @@ public class SessionManager extends HttpServlet {
 			}
 			
 			sessionTable.putSession(sessionobject.getSessionId(), sessionobject);
+			Cookie c = new Cookie(COOKIE_STRING, sessionobject.getSessionId());
+			c.setMaxAge(COOKIE_AGE);
+			response.addCookie(c);
 			System.out.println(sessionobject.getMessage() + "|" + sessionobject.getExpirationTime().toString() 
 					+ "|" + sessionobject.getVersion());
 			responsewriter.write(sessionobject.getMessage() + "|" + sessionobject.getExpirationTime().toString() 
