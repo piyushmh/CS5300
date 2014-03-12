@@ -1,5 +1,7 @@
 *.class
-
+RemoteSystemsTempFiles/*
+Servers/*
+.metadata/*
 # Package Files #
 *.jar
 *.war
