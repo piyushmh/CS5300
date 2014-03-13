@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class CleanUpDaemonInitializer implements ServletContextListener{
 
-	private static int CLEAN_UP_DAEMON_FREQUENCY = 60*1000;
+	private static int CLEAN_UP_DAEMON_FREQUENCY = 5*60*1000;
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {

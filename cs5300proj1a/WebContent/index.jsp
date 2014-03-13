@@ -16,7 +16,7 @@
 <b>Cookie VersionNumber : </b><p id="cookieversionnumber"></p><br/>
 
 <br/><br/>
-<button type="button" id ="replace">Replace</button><input type="text" name="message" id="servermessageinput"/>
+<button type="button" id ="replace">Replace</button><input type="text" name="message" id="servermessageinput"/>(Message will be truncated after 30 characters)
 <br/>
 <button type="button" id="refresh">Refresh</button>
 <br/>
@@ -76,6 +76,9 @@ $('#replace').click(function(){
 	if( newmessage.length == 0 ){
 		alert("Message text is empty");
 	}else{
+		if( newmessage.length > 30){
+			newmessage = newmessage.substring(0,29);
+		}
 		$.ajax({
 			url : "SessionManager",
 			type : "GET",

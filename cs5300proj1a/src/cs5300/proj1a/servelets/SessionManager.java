@@ -3,7 +3,6 @@ package cs5300.proj1a.servelets;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.activity.InvalidActivityException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -38,7 +37,7 @@ public class SessionManager extends HttpServlet {
 	
 	private static String MESSAGE = "This is a default CS 5300 message";
 	
-	private static int COOKIE_AGE = 60*1;
+	private static int COOKIE_AGE = 60*5;
 	
 	public static SessionTable sessionTable = new ConcurrentHashMapSessionTable();
 	
@@ -127,7 +126,7 @@ public class SessionManager extends HttpServlet {
 			Cookie c = new Cookie(COOKIE_STRING, sessionobject.getSessionId());
 			c.setMaxAge(COOKIE_AGE);
 			response.addCookie(c);
-			responsewriter.write(MESSAGE + "|" + sessionobject.getExpirationTime() 
+			responsewriter.write(sessionobject.getMessage() + "|" + sessionobject.getExpirationTime() 
 					+ "|" + sessionobject.getVersion());
 			System.out.println("Session refresh : " + sessionobject.getMessage() + 
 					"|" + sessionobject.getExpirationTime().toString() + "|" + sessionobject.getVersion());
@@ -165,11 +164,13 @@ public class SessionManager extends HttpServlet {
 			
 		
 		}else {//logout request	
-			Cookie c = new Cookie(COOKIE_STRING, sessionId);
-			c.setMaxAge(0);
-			sessionTable.deleteObject(sessionId);
-			System.out.println("Logging out of session:"+ sessionId);
-			response.addCookie(c);
+			if( sessionId != null){
+				Cookie c = new Cookie(COOKIE_STRING, sessionId);
+				c.setMaxAge(0);
+				sessionTable.deleteObject(sessionId);
+				System.out.println("Logging out of session:"+ sessionId);
+				response.addCookie(c);
+			}
 			System.out.println("Size of the session table is :" + sessionTable.getSize());
 		}
 		
