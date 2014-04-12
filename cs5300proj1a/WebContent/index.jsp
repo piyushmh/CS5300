@@ -11,8 +11,14 @@
 <div>
 
 <br/><br/>
+<b> Server Id :</b><p id="serverid"></p>
 <b> Server Message :</b><p id="servermessage"></p><br/>
+<b> Data found on host :</b><p id="datafoundhost"></p><br/>
+<b> Primary Host :</b><p id="primaryhost"></p><br/>
+<b> Secondary Host : </b><p id="secondaryhost"></p><br/>
+<b> Server view :</b><p id="serverview"></p><br/>
 <b>Cookie Expiration Time : </b><p id="cookieexptime"></p><br/>
+<b>Cookie Discard Time : </b><p id="cookiediscardtime"></p><br/>
 <b>Cookie VersionNumber : </b><p id="cookieversionnumber"></p><br/>
 
 <br/><br/>
@@ -39,9 +45,16 @@ $(function(){
 		success : function( data, textstatus, jqXHR){
 			
 			var response = data.split("|");
-			$("#servermessage").text(response[0]);
-	    	$("#cookieexptime").text(response[1]);
-			$("#cookieversionnumber").text(response[2]);
+			$("#servermessage").text(response[0].trim());
+	    	$("#cookiediscardtime").text(response[1]);
+	    	$("#cookieexptime").text(response[2]);
+	    	$("#serverid").text(response[4]);
+	    	var repservers = response[5].split(",");
+	    	$("#primaryhost").text(repservers[0]);
+	    	$("#secondaryhost").text(repservers[1]);
+	    	$("#serverview").text(response[6]);
+	    	$("#datafoundhost").text(response[7]);
+			$("#cookieversionnumber").text(response[3]);
 		},
 		error : function( jqXHR, textstatus, errorThrown){
 			alert(errorThrown);
@@ -62,7 +75,7 @@ $('#refresh').click(function(){
 			var response = data.split("|");
 			$("#servermessage").text(response[0]);
 	    	$("#cookieexptime").text(response[1]);
-			$("#cookieversionnumber").text(response[2]);
+			$("#cookieversionnumber").text(response[3]);
 		},
 		error : function( jqXHR, textstatus, errorThrown){
 			alert(errorThrown);
@@ -92,7 +105,7 @@ $('#replace').click(function(){
 				var response = data.split("|");
 				$("#servermessage").text(response[0]);
 		    	$("#cookieexptime").text(response[1]);
-				$("#cookieversionnumber").text(response[2]);
+				$("#cookieversionnumber").text(response[3]);
 			},
 			error : function( jqXHR, textstatus, errorThrown){
 				alert(errorThrown);

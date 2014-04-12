@@ -1,6 +1,7 @@
 package cs5300.proj1a.utils;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -20,6 +21,19 @@ public class Utils {
 		}else{
 			return false;
 		}
+	}
+	
+	public static String generateDelimitedStringFromList(
+			char delimited, ArrayList<String> l){
+		
+		if( l.size() == 0)
+			return " ";
+		String retvalString = l.get(0);
+		
+		for( int i = 1; i < l.size(); i++){
+			retvalString += delimited + l.get(i);
+		}
+		return retvalString;
 	}
 }
 

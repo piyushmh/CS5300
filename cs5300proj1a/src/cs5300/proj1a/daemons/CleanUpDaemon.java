@@ -6,8 +6,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cs5300.proj1a.objects.SessionObject;
-import cs5300.proj1a.servelets.SessionManager;
-import cs5300.proj1a.sessiontable.ConcurrentHashMapSessionTable;
+import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
 
 public class CleanUpDaemon extends TimerTask {
@@ -17,7 +16,7 @@ public class CleanUpDaemon extends TimerTask {
 		
 		System.out.println("Clean up daemon running");
 		
-		ConcurrentHashMap<String, SessionObject> map = ((ConcurrentHashMapSessionTable) SessionManager.sessionTable).concurrentHashMap;
+		ConcurrentHashMap<String, SessionObject> map = WebServer.sessionTable.concurrentHashMap;
 		Iterator<Map.Entry<String,SessionObject>> it = map.entrySet().iterator();
 		long currenttime = Utils.getCurrentTimeInMillis();
 		while( it.hasNext()){

@@ -43,7 +43,7 @@ There is only one servlet class and the actions are differentiated by passing a 
 
     3) Replace - In this case the new message is passed to the server and is replaced in the session object. The expiration time is reset and the version number is incremented too. In case the cookie does not have a valid session id which is possible when someone clicks on the replace button after a log out, a new sesssion is created. The replace message is truncated to 30 character to make sure that the session state is limited to 512 bytes.
 
-    4) Refresh - In this case the expirating time is reset and the version number is incremented. If the cookie does not contain a session id or the session has expired, a new session is created.
+    4) Refresh - In this case the expiration time is reset and the version number is incremented. If the cookie does not contain a session id or the session has expired, a new session is created.
 
     5) Logout - In this case the session entry is removed from the session table. The max age of the cookie is set to be zero so that the browser would throw away from cookie.
 

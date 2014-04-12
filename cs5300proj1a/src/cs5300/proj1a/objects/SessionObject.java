@@ -1,10 +1,8 @@
 package cs5300.proj1a.objects;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import cs5300.proj1a.utils.Utils;
 
 public class SessionObject {
 
@@ -13,13 +11,12 @@ public class SessionObject {
 	private String message;
 	private long expirationTime;
 	
-	public SessionObject(String message, long expirationTime) throws UnknownHostException {
+	public SessionObject(String message, long expirationTime, HostInformation hostInfo) throws UnknownHostException {
 		super();
 		this.message = message;
-		this.expirationTime = Utils.getCurrentTimeInMillis() + expirationTime;
-		
+		this.expirationTime = expirationTime;
 		String uid = new java.rmi.server.UID().toString();
-		uid += InetAddress.getLocalHost().hashCode();
+		uid += hostInfo.getIPAddress();
 		this.sessionId = uid;
 		this.setVersion(0);
 	}
