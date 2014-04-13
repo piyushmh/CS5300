@@ -20,6 +20,7 @@ import cs5300.proj1b.managers.CookieManager;
 import cs5300.proj1b.managers.RPCCommunicationManager;
 import cs5300.proj1b.managers.ServerViewManager;
 import cs5300.proj1b.managers.SessionManager;
+import cs5300.proj1b.managers.SimpleDBInteractionManager;
 
 /**
  * Servlet implementation class SessionManager
@@ -58,6 +59,8 @@ public class WebServer extends HttpServlet {
 	public static SessionManager sessionManager = new SessionManager();
 
 	public static CookieManager cookieManager = new CookieManager();
+	
+	public static SimpleDBInteractionManager simpleDBManager = new SimpleDBInteractionManager();
 
 	public WebServer() {
 		super();
@@ -166,7 +169,7 @@ public class WebServer extends HttpServlet {
 			String retstring = sessionobject.getMessage() + "|" + sessionobject.getExpirationTime().toString() 
 					+ "|" + COOKIE_AGE + "|" + sessionobject.getVersion()
 					+ "|" + hostInfo.getIPAddress() + "|" + Utils.generateDelimitedStringFromList(',', replicatedservers)
-					+ "|" + Utils.generateDelimitedStringFromList(',', new ArrayList<String>(viewManager.getServerView())) 
+					+ "|" + Utils.generateDelimitedStringFromList(',', new ArrayList<String>(viewManager.getServerViewList())) 
 					+ "|" + servernum + "|" + servermessage;
 			
 			responsewriter.write(retstring);

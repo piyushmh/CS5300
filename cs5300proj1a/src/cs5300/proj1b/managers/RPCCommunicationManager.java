@@ -1,6 +1,8 @@
 package cs5300.proj1b.managers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 import cs5300.proj1a.objects.SessionObject;
@@ -20,9 +22,33 @@ public class RPCCommunicationManager {
 	private static int SESSION_READ_OPCODE = 1;
 
 	private static int SESSION_WRITE_OPCODE = 2;
+	
+	private static int VIEW_GOSSIP_OPCODE = 3;
 
 	private static int CONFIRMATION_CODE = 400;
 
+	
+	public String gossipViewWithHost(String server){
+		
+		System.out.println("Inside RPC Communication Manager: Gossiping with host : " + server);
+		
+		String callId = UUID.randomUUID().toString(); 
+		String serverString = 
+				callId + NETWORK_DELIMITER + VIEW_GOSSIP_OPCODE;
+		
+		String reply = null;
+		try {
+
+			reply = new RPCClient().callServer(server, RPC_SERVER_PORT, serverString, callId);	
+			System.out.println("String received from server : " + reply);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return reply;
+	}
+	
 	public boolean replicateSession(
 			SessionObject object, 
 			String replicaserver){
@@ -133,7 +159,15 @@ public class RPCCommunicationManager {
 
 			WebServer.sessionManager.addSessionLocally(sessionObject, WebServer.sessionTable);
 			retvalString += NETWORK_DELIMITER + CONFIRMATION_CODE;
-		}
+		
+		} else if( opcode == VIEW_GOSSIP_OPCODE){
+			
+			//EXPECTEDFORMAT = CALLID|OPCODE
+			
+			Set<String> selfviewSet = WebServer.viewManager.getServerViewSet();
+			retvalString += NETWORK_DELIMITER + Utils.generateDelimitedStringFromList(
+					ServerViewManager.NETWORK_VIEW_DELIMITER , new ArrayList<String>(selfviewSet));
+ 		}
 
 		System.out.println("String returning to client : " + retvalString);
 		return retvalString;

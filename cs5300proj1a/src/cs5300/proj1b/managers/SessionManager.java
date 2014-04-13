@@ -9,6 +9,8 @@ import cs5300.proj1a.objects.Metadata;
 import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.sessiontable.SessionTable;
 
+//Author - Piyush
+
 public class SessionManager {
 
 	private static int replicationFactor = 2;
@@ -84,7 +86,7 @@ public class SessionManager {
 
 		addSessionLocally(object, table); //store locally first
 
-		Set<String> view = viewmanager.getServerView();
+		Set<String> view = viewmanager.getServerViewSet();
 		ArrayList<String> replicatedServers = new ArrayList<String>();
 		replicatedServers.add(hostInfo.getIPAddress());
 
