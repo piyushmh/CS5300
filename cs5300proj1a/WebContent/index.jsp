@@ -45,6 +45,16 @@ $(function(){
 		success : function( data, textstatus, jqXHR){
 			
 			var response = data.split("|");
+			
+			var servermessage = response[8];
+			servermesssage = servermessage.trim();
+			console.log("1 : " + servermessage);
+			if( servermessage.length > 0){
+				if( servermessage == "SESSIONTIMEDOUT"){
+					alert("Session timed out, creating a new session");
+				}
+			}
+			
 			$("#servermessage").text(response[0].trim());
 	    	$("#cookiediscardtime").text(response[1]);
 	    	$("#cookieexptime").text(response[2]);
@@ -55,6 +65,7 @@ $(function(){
 	    	$("#serverview").text(response[6]);
 	    	$("#datafoundhost").text(response[7]);
 			$("#cookieversionnumber").text(response[3]);
+			
 		},
 		error : function( jqXHR, textstatus, errorThrown){
 			alert(errorThrown);

@@ -16,10 +16,10 @@ import cs5300.proj1a.objects.Metadata;
 import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.sessiontable.SessionTable;
 import cs5300.proj1a.utils.Utils;
-import cs5300proj1b.managers.CookieManager;
-import cs5300proj1b.managers.RPCCommunicationManager;
-import cs5300proj1b.managers.ServerViewManager;
-import cs5300proj1b.managers.SessionManager;
+import cs5300.proj1b.managers.CookieManager;
+import cs5300.proj1b.managers.RPCCommunicationManager;
+import cs5300.proj1b.managers.ServerViewManager;
+import cs5300.proj1b.managers.SessionManager;
 
 /**
  * Servlet implementation class SessionManager
@@ -82,9 +82,10 @@ public class WebServer extends HttpServlet {
 		System.out.println("Size of the session table is :" + sessionTable.getSize());
 		System.out.println("Cookie content from the browser cookie is : " + cookiecontent);
 
+		String servermessage = "";
 		long newTime = Utils.getCurrentTimeInMillis() + COOKIE_AGE * 1000;
 		int newcookieAge = COOKIE_AGE; 
-		Metadata metadataobject = sessionManager.fetchSession(cookiecontent, cookieManager, sessionTable, hostInfo);
+		Metadata metadataobject = sessionManager.fetchSession(cookiecontent, rpcManager, viewManager, cookieManager, sessionTable, hostInfo);
 		
 		SessionObject sessionobject = null;
 		int servernum = -1;
@@ -92,6 +93,10 @@ public class WebServer extends HttpServlet {
 		if( metadataobject!= null){
 			sessionobject = metadataobject.getSessionObject();
 			servernum = metadataobject.getServernum();
+		}else{
+			if( cookiecontent!= null){
+				servermessage = "SESSIONTIMEDOUT";
+			}
 		}
 		
 		//ArrayList<String> replicatedServers = metadataobject.getReplicatedServers();
@@ -101,6 +106,7 @@ public class WebServer extends HttpServlet {
 			if ( Utils.hasSessionExpired(sessionobject.getExpirationTime())){
 				sessionManager.deleteSession(sessionobject.getSessionId(), sessionTable);
 				sessionobject = null;
+				servermessage = "SESSIONTIMEDOUT";
 			}
 		}
 
@@ -159,7 +165,7 @@ public class WebServer extends HttpServlet {
 					+ "|" + COOKIE_AGE + "|" + sessionobject.getVersion()
 					+ "|" + hostInfo.getIPAddress() + "|" + Utils.generateDelimitedStringFromList(',', replicatedservers)
 					+ "|" + Utils.generateDelimitedStringFromList(',', new ArrayList<String>(viewManager.getServerView())) 
-					+ "|" + servernum ;
+					+ "|" + servernum + "|" + servermessage;
 			
 			responsewriter.write(retstring);
 			

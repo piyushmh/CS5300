@@ -20,6 +20,10 @@ public class SessionObject {
 		this.sessionId = uid;
 		this.setVersion(0);
 	}
+	
+	public SessionObject(){
+		
+	}
 
 	
 	public String getSessionId() {
