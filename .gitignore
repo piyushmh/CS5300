@@ -3,7 +3,8 @@ RemoteSystemsTempFiles/*
 Servers/*
 .metadata/*
 cs5300proj1a/build/*
-
+cs5300proj1a/.classpath
+cs5300proj1a/src/AwsCredentials.properties
 # Package Files #
 *.war
 *.ear
