@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.logging.Logger;
 
 import cs5300.proj1b.managers.RPCCommunicationManager;
 
@@ -28,7 +29,8 @@ public class RPCServer implements Runnable{
 
 	private static final int MAX_PACKET_LENGTH = 512;
 	private static final int PORT = 5300;
-
+	private Logger logger = Logger.getLogger(RPCServer.class.getName());
+	
 	DatagramSocket rpcSocket;
 
 	public RPCServer() throws SocketException{
@@ -37,20 +39,22 @@ public class RPCServer implements Runnable{
 
 	@Override
 	public void run() {
-		System.out.println("RPC Server starting");
+		
+		logger.info("RPC Server starting");
+		
 		while(true){
 			try { 
-				System.out.println("RPC Server loop beginning");
+				logger.info("RPC Server loop beginning");
 				byte[] inBuf = new byte[MAX_PACKET_LENGTH];
 				DatagramPacket recvPkt = new DatagramPacket(inBuf, inBuf.length);
 				rpcSocket.receive(recvPkt);
 				InetAddress returnAddr = recvPkt.getAddress();
 				int returnPort = recvPkt.getPort();
-				System.out.println("Packet received from : " + returnAddr.getHostAddress() 
+				logger.info("Packet received from : " + returnAddr.getHostAddress() 
 						+ " : " + returnPort);
 
 				String newString = new String(recvPkt.getData());
-				System.out.println("Received Packet : "+ newString);
+				logger.info("Received Packet : "+ newString);
 
 				String resultdata  = new RPCCommunicationManager().replyToClient(newString);
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.logging.Logger;
 
 
 /**
@@ -15,6 +16,8 @@ public class RPCClient {
 	private static final int MAX_PACKET_SIZE = 512;
 	
 	private static final int SOCKET_TIME_OUT_MS = 5 * 1000;
+
+	private Logger logger = Logger.getLogger(RPCClient.class.getName());
 
 	//TODO - Add retry in case of IO Exception
 	public String callServer(
@@ -42,7 +45,7 @@ public class RPCClient {
 				rpcSocket.receive(recvPkt);
 			}while(verifyResponse(new String(inBuf),  callId));
 			
-			System.out.println("String recieved from server : " + new String(inBuf));
+			logger.info("String recieved from server : " + new String(inBuf));
 			return new String(inBuf);
 			
 		} catch (IOException e) {

@@ -3,6 +3,7 @@ package cs5300.proj1b.managers;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import cs5300.proj1a.objects.HostInformation;
 import cs5300.proj1a.objects.Metadata;
@@ -15,6 +16,8 @@ public class SessionManager {
 
 	private static int replicationFactor = 2;
 
+	private Logger logger = Logger.getLogger(SessionManager.class.getName());
+
 	public Metadata fetchSession(
 			String cookiecontent,
 			RPCCommunicationManager rpcmanager,
@@ -23,6 +26,9 @@ public class SessionManager {
 			SessionTable sessionTable,
 			HostInformation hostInfo){
 
+		logger.info("Fetching session for cookiecontent :"
+				+ cookiecontent);
+		
 		if( cookiecontent == null)
 			return null;
 
@@ -43,9 +49,7 @@ public class SessionManager {
 		SessionObject sessionObject = null; 
 		int servernumber = checkIfReplicatedOnCurrentHost(replicatedServers, hostInfo.getIPAddress());
 
-		System.out.println("1. " + sessionId + " " + versionNum + " " + servernumber);
-
-		if( servernumber != -1){
+				if( servernumber != -1){
 			sessionObject = sessionTable.getSession(sessionId, versionNum);
 		}
 
@@ -99,7 +103,7 @@ public class SessionManager {
 			}
 		}
 
-		System.out.println("Replication successfully done on hosts :" + replicatedServers.size());		
+		logger.info("Replication successfully done on hosts :" + replicatedServers.size());		
 		return replicatedServers;
 
 	}
@@ -109,7 +113,7 @@ public class SessionManager {
 			SessionTable table){
 
 		table.putSession(sessionobject.getSessionId(), sessionobject);
-		System.out.println("Size of the hash table after the update is : " 
+		logger.info("Size of the hash table after the update is : " 
 				+  table.concurrentHashMap.size());
 
 	}
