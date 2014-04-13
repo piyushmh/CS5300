@@ -78,7 +78,7 @@ public class SessionManager {
 
 		addSessionLocally(object, table); //store locally first
 
-		Set<String> view = new HashSet<String>();
+		Set<String> view = viewmanager.getServerView();
 		ArrayList<String> replicatedServers = new ArrayList<String>();
 		replicatedServers.add(hostInfo.getIPAddress());
 

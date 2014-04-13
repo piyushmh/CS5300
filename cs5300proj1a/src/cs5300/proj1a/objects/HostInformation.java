@@ -72,7 +72,6 @@ public class HostInformation {
 				if (segment == null || segment.length() <= 0) {
 					return false;
 				}
-
 				int value = 0;
 				try {
 					value = Integer.parseInt(segment);
