@@ -2,6 +2,7 @@ package cs5300.proj1b.managers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
 import cs5300.proj1b.rpc.RPCClient;
+
 import java.util.logging.*;
 
 public class RPCCommunicationManager {
@@ -73,7 +75,7 @@ public class RPCCommunicationManager {
 			System.out.println("String received from server : " + reply);
 			if( reply!= null){
 				String[] list = reply.split(REGEX_NETWORK_DELIMITER);
-				System.out.println(Utils.printStringList(list));
+				System.out.println(Utils.printStringList(Arrays.asList(list)));
 				if( 400 == Integer.parseInt(list[1].trim()));
 				retval = true;
 			}else{
@@ -105,7 +107,7 @@ public class RPCCommunicationManager {
 				
 				String[] list = outputString.split(REGEX_NETWORK_DELIMITER);
 				
-				System.out.println("Inside session read : " + Utils.printStringList(list));
+				System.out.println("Inside session read : " + Utils.printStringList(Arrays.asList(list)));
 				
 				if( Integer.parseInt(list[1].trim()) != -1){
 					
@@ -129,7 +131,7 @@ public class RPCCommunicationManager {
 
 		System.out.println("String received from client : " + s);
 		String[] list = s.split(REGEX_NETWORK_DELIMITER);
-		System.out.println(Utils.printStringList(list));
+		System.out.println(Utils.printStringList(Arrays.asList(list)));
 		String retvalString = list[0]; //return the same call id
 
 		int opcode = Integer.parseInt(list[1].trim());

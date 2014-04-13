@@ -2,8 +2,10 @@ package cs5300.proj1a.utils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.Set;
+
 
 
 public class Utils {
@@ -24,13 +26,16 @@ public class Utils {
 		}
 	}
 
-	public static String[] splitAndTrim(String arg,String delRegex){
+	public static List<String> splitAndTrim(String arg,String delRegex){
 
-		String[] list = arg.split(delRegex);
-		for( int i = 0; i < list.length ; i++){
-			list[i] = list[i].trim();
+		String[] l = arg.split(delRegex);
+		List<String> newList = new ArrayList<String>();
+		for( int i = 0; i < l.length ; i++){
+			if( l[i].trim().length() > 0){
+				newList.add(l[i].trim());
+			}
 		}
-		return list;
+		return newList;
 	} 
 
 	public static String generateDelimitedStringFromList(
@@ -59,7 +64,7 @@ public class Utils {
 		return retvalString;
 	}
 
-	public static String printStringList( String[] s){
+	public static String printStringList( List<String> s){
 
 		String retString = "[";
 		for (String string : s) {

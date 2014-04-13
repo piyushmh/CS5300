@@ -74,12 +74,15 @@ public class ServerViewManager {
 
 		logger.info("Adding own IP to bootstrap server");
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
-		String[] servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
-		Set<String> serverSet = new HashSet<String>(Arrays.asList(servers));
+		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
+		logger.info("Received servers : " + Utils.printStringList(servers));
+		Set<String> serverSet = new HashSet<String>(servers);
 		serverSet = removeFromView(serverSet, NULL_SERVER);
+		logger.info("Null removed servers : " + Utils.printStringList(servers));
 		serverSet = shrinkView(serverSet, VIEW_SIZE - 1);
+		logger.info("Shrunk servers : " + Utils.printStringList(servers));
 		serverSet = addToView(serverSet, WebServer.hostInfo.getIPAddress());
-		
+		logger.info("Own IP added servers : " + Utils.printStringList(servers));
 		assert( serverSet.size() <= VIEW_SIZE);
 		
 		String write = Utils.generateDelimitedStringFromList(SIMPLE_DB_DELIMITER, new ArrayList<String>(serverSet));
@@ -90,8 +93,8 @@ public class ServerViewManager {
 		
 		String viewstring = WebServer.rpcManager.gossipViewWithHost(hostname);
 		if( viewstring!= null){
-			String[] viewarray = Utils.splitAndTrim(viewstring, REGEX_SIMPLE_DB_DELIMITER);
-			return new HashSet<String>(Arrays.asList(viewarray));
+			List<String> viewarray = Utils.splitAndTrim(viewstring, REGEX_SIMPLE_DB_DELIMITER);
+			return new HashSet<String>(viewarray);
 		}else{
 			System.out.println("Inside ServerViewManager:getHostView : Operating getting "
 					+ "host view failed, returning empty set");
@@ -123,8 +126,8 @@ public class ServerViewManager {
 		
 		logger.info("Gossiping with boot strap server");
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
-		String[] servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
-		Set<String> bootServerSet = new HashSet<String>(Arrays.asList(servers));
+		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
+		Set<String> bootServerSet = new HashSet<String>(servers);
 		bootServerSet = removeFromView(bootServerSet, WebServer.hostInfo.getIPAddress());
 		
 		Set<String> combinedviewSet = unionView(bootServerSet, this.serverView.getServerSet());
@@ -153,7 +156,7 @@ public class ServerViewManager {
 		int size = this.serverView.getServerSet().size();
 		int randomindex =  (int) (Math.random() * (size + 1) );
 		
-		if( size > 0 && randomindex < VIEW_SIZE){
+		if( size > 0 && randomindex < size){
 			gossipViewWithHost(new ArrayList<String>(
 					this.serverView.getServerSet()).get(randomindex));
 		}else{

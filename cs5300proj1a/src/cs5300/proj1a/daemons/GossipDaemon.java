@@ -25,7 +25,7 @@ public class GossipDaemon implements Runnable{
 						(Math.random()* GOSSIP_INTERVAL_SEC) );
 				
 				LOGGER.info("Next gossip interval is :" + interval);
-				Thread.sleep(interval);
+				Thread.sleep(interval * 1000);
 				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
