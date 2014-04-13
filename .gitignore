@@ -1,0 +1,10 @@
+*.class
+RemoteSystemsTempFiles/*
+Servers/*
+.metadata/*
+cs5300proj1a/build/*
+
+# Package Files #
+*.jar
+*.war
+*.ear
