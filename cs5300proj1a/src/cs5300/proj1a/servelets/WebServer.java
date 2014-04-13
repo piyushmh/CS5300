@@ -94,9 +94,7 @@ public class WebServer extends HttpServlet {
 			sessionobject = metadataobject.getSessionObject();
 			servernum = metadataobject.getServernum();
 		}else{
-			if( cookiecontent!= null){
-				servermessage = "SESSIONTIMEDOUT";
-			}
+			assert(false);
 		}
 		
 		//ArrayList<String> replicatedServers = metadataobject.getReplicatedServers();
@@ -106,6 +104,10 @@ public class WebServer extends HttpServlet {
 			if ( Utils.hasSessionExpired(sessionobject.getExpirationTime())){
 				sessionManager.deleteSession(sessionobject.getSessionId(), sessionTable);
 				sessionobject = null;
+				servermessage = "SESSIONTIMEDOUT";
+			}
+		}else{
+			if( cookiecontent!= null){
 				servermessage = "SESSIONTIMEDOUT";
 			}
 		}

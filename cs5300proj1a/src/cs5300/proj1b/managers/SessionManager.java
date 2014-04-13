@@ -107,6 +107,8 @@ public class SessionManager {
 			SessionTable table){
 
 		table.putSession(sessionobject.getSessionId(), sessionobject);
+		System.out.println("Size of the hash table after the update is : " 
+				+  table.concurrentHashMap.size());
 
 	}
 

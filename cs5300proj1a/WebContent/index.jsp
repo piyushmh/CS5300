@@ -34,6 +34,33 @@
 <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript">
 
+function populate(data){
+	
+	var response = data.split("|");
+	
+	var srvmessage = response[8];
+	srvmessage = srvmessage.trim(); //this will become empty there was no explicit server message
+	
+	console.log("Server message : " + srvmessage);
+	if( srvmessage.length > 0){
+		if( srvmessage == "SESSIONTIMEDOUT"){
+			alert("Session timed out, creating a new session");
+		}
+	}
+	
+	$("#servermessage").text(response[0].trim());
+	$("#cookiediscardtime").text(response[1]);
+	$("#cookieexptime").text(response[2]);
+	$("#serverid").text(response[4]);
+	var repservers = response[5].split(",");
+	$("#primaryhost").text(repservers[0]);
+	$("#secondaryhost").text(repservers[1]);
+	$("#serverview").text(response[6]);
+	$("#datafoundhost").text(response[7]);
+	$("#cookieversionnumber").text(response[3]);
+
+}
+
 $(function(){
 	$.ajax({
 		url : "SessionManager",
@@ -44,27 +71,7 @@ $(function(){
 		},
 		success : function( data, textstatus, jqXHR){
 			
-			var response = data.split("|");
-			
-			var servermessage = response[8];
-			servermesssage = servermessage.trim();
-			console.log("1 : " + servermessage);
-			if( servermessage.length > 0){
-				if( servermessage == "SESSIONTIMEDOUT"){
-					alert("Session timed out, creating a new session");
-				}
-			}
-			
-			$("#servermessage").text(response[0].trim());
-	    	$("#cookiediscardtime").text(response[1]);
-	    	$("#cookieexptime").text(response[2]);
-	    	$("#serverid").text(response[4]);
-	    	var repservers = response[5].split(",");
-	    	$("#primaryhost").text(repservers[0]);
-	    	$("#secondaryhost").text(repservers[1]);
-	    	$("#serverview").text(response[6]);
-	    	$("#datafoundhost").text(response[7]);
-			$("#cookieversionnumber").text(response[3]);
+			populate(data);
 			
 		},
 		error : function( jqXHR, textstatus, errorThrown){
@@ -83,10 +90,7 @@ $('#refresh').click(function(){
 		},
 		success : function( data, textstatus, jqXHR){
 			
-			var response = data.split("|");
-			$("#servermessage").text(response[0]);
-	    	$("#cookieexptime").text(response[1]);
-			$("#cookieversionnumber").text(response[3]);
+			populate(data);
 		},
 		error : function( jqXHR, textstatus, errorThrown){
 			alert(errorThrown);
@@ -113,10 +117,8 @@ $('#replace').click(function(){
 			},
 			success : function( data, textstatus, jqXHR){
 				
-				var response = data.split("|");
-				$("#servermessage").text(response[0]);
-		    	$("#cookieexptime").text(response[1]);
-				$("#cookieversionnumber").text(response[3]);
+				populate(data);
+				
 			},
 			error : function( jqXHR, textstatus, errorThrown){
 				alert(errorThrown);
@@ -135,9 +137,16 @@ $('#logout').click(function(){
 			param : "logout"
 		},
 		success : function( data, textstatus, jqXHR){
+			
 			alert("You have been logged out!");	
 			$("#servermessage").text("");
 			$("#cookieexptime").text("");
+			$("#cookieversionnumber").text("");
+			$("#serverid").text("");
+			$("#primaryhost").text("");
+			$("#secondaryhost").text("");
+			$("#serverview").text("");
+			$("#datafoundhost").text("");
 			$("#cookieversionnumber").text("");
 		},
 		error : function( jqXHR, textstatus, errorThrown){
@@ -145,6 +154,7 @@ $('#logout').click(function(){
 		}
 	});
 });
+
 
 
 </script>

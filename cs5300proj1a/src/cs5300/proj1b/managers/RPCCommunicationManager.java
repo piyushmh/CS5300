@@ -27,7 +27,7 @@ public class RPCCommunicationManager {
 			SessionObject object, 
 			String replicaserver){
 
-		System.out.println("Replication session id : " + object.getSessionId() + 
+		System.out.println("Replicating session id : " + object.getSessionId() + 
 				" on server : " + replicaserver);
 
 		boolean retval = false;
