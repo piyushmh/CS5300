@@ -16,7 +16,7 @@ public class RPCCommunicationManager {
 	private static int SESSION_READ_OPCODE = 1;
 
 	private static int SESSION_WRITE_OPCODE = 2;
-	
+
 	private static int CONFIRMATION_CODE = 400;
 
 	public boolean replicateSession(
@@ -25,7 +25,7 @@ public class RPCCommunicationManager {
 
 		System.out.println("Replication session id : " + object.getSessionId() + 
 				" on server : " + replicaserver);
-		
+
 		boolean retval = false;
 		String callId = UUID.randomUUID().toString(); //callID
 		String serverstring = 
@@ -35,14 +35,16 @@ public class RPCCommunicationManager {
 				object.getMessage() + 	NETWORK_DELIMITER + 
 				object.getVersion() + 	NETWORK_DELIMITER + 
 				object.getExpirationTimeMilliSecond();
-		
+
 		try {
-			
+
 			String reply = new RPCClient().callServer(replicaserver, RPC_SERVER_PORT, serverstring, callId);	
-			String[] list = reply.split(NETWORK_DELIMITER);
-			if( 400 == Integer.parseInt(list[1]));
+			if( reply!= null){
+				String[] list = reply.split(NETWORK_DELIMITER);
+				if( 400 == Integer.parseInt(list[1]));
 				retval = true;
-			
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -79,42 +81,42 @@ public class RPCCommunicationManager {
 	}
 
 	public String replyToClient( String s){
-		
+
 		System.out.println("String received from client : " + s);
 		String[] list = s.split(NETWORK_DELIMITER);
 		String retvalString = list[0]; //return the same call id
-		
+
 		int opcode = Integer.parseInt(list[1]);
-		
+
 		if( opcode == SESSION_READ_OPCODE){
-			
+
 			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|VERSION
-			
+
 			SessionObject object = WebServer.sessionTable.concurrentHashMap.get(list[2]);
 			if(object != null && (object.getVersion() == Integer.parseInt(list[3]))){
-				
+
 				retvalString += NETWORK_DELIMITER + object.getVersion() + NETWORK_DELIMITER + object.getMessage()
 						+ NETWORK_DELIMITER + object.getExpirationTimeMilliSecond();
-				
+
 			}else{
-				
+
 				retvalString += NETWORK_DELIMITER + -1 + NETWORK_DELIMITER + " " + NETWORK_DELIMITER + -1;
 			}
-			
+
 		}else if ( opcode == SESSION_WRITE_OPCODE){
-			
+
 			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|MESSAGE|VERSION|EXPIRATIONDATE
-			
+
 			SessionObject sessionObject = new SessionObject();
 			sessionObject.setSessionId(list[2].trim());
 			sessionObject.setMessage(list[3].trim());
 			sessionObject.setVersion(Integer.parseInt(list[4].trim()));
 			sessionObject.setExpirationTime(Long.parseLong(list[5].trim()));
-			
+
 			WebServer.sessionManager.addSessionLocally(sessionObject, WebServer.sessionTable);
 			retvalString += NETWORK_DELIMITER + CONFIRMATION_CODE;
 		}
-		
+
 		System.out.println("String returning to client : " + retvalString);
 		return retvalString;
 	}
