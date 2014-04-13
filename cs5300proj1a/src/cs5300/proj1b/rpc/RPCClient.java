@@ -42,6 +42,7 @@ public class RPCClient {
 				rpcSocket.receive(recvPkt);
 			}while(verifyResponse(new String(inBuf),  callId));
 			
+			System.out.println("String recieved from server : " + new String(inBuf));
 			return new String(inBuf);
 			
 		} catch (IOException e) {

@@ -35,5 +35,15 @@ public class Utils {
 		}
 		return retvalString;
 	}
+	
+	public static String printStringList( String[] s){
+		
+		String retString = "[";
+		for (String string : s) {
+			retString += string+",";
+		} 
+		retString += "]";
+		return retString;
+	}
 }
 
