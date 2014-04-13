@@ -3,6 +3,7 @@ package cs5300.proj1a.servelets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,6 +29,8 @@ import cs5300.proj1b.managers.SimpleDBInteractionManager;
  */
 @WebServlet("/SessionManager")
 public class WebServer extends HttpServlet {
+	private final static Logger LOGGER = Logger.getLogger(WebServer.class.getName());
+	
 	private static final long serialVersionUID = 1L;
 
 	/*String used to represent parameter*/
@@ -82,8 +85,8 @@ public class WebServer extends HttpServlet {
 				break;
 			}
 		}
-		System.out.println("Size of the session table is :" + sessionTable.getSize());
-		System.out.println("Cookie content from the browser cookie is : " + cookiecontent);
+		LOGGER.info("Size of the session table is :" + sessionTable.getSize());
+		LOGGER.info("Cookie content from the browser cookie is : " + cookiecontent);
 
 		String servermessage = "";
 		long newTime = Utils.getCurrentTimeInMillis() + COOKIE_AGE * 1000;
@@ -102,7 +105,7 @@ public class WebServer extends HttpServlet {
 		
 		//ArrayList<String> replicatedServers = metadataobject.getReplicatedServers();
 		
-		System.out.println("Retrieved session from session table : " + sessionobject);
+		LOGGER.info("Retrieved session from session table : " + sessionobject);
 		if( sessionobject!= null){
 			if ( Utils.hasSessionExpired(sessionobject.getExpirationTime())){
 				sessionManager.deleteSession(sessionobject.getSessionId(), sessionTable);
@@ -119,37 +122,37 @@ public class WebServer extends HttpServlet {
 
 			if( param.equalsIgnoreCase(PAGE_LOAD)){
 
-				System.out.println("Inside page load");		
+				LOGGER.info("Inside page load");		
 				sessionobject.incrementVersionNumber();
 				sessionobject.setExpirationTime(newTime);
 
 			}else if (param.equalsIgnoreCase(REFRESH)){
 
-				System.out.println("Inside page refresh");
+				LOGGER.info("Inside page refresh");
 				sessionobject.incrementVersionNumber();
 				sessionobject.setExpirationTime(newTime);
 
 			}else if (param.equalsIgnoreCase(REPLACE)){
 
-				System.out.println("Inside replace");
+				LOGGER.info("Inside replace");
 				sessionobject.incrementVersionNumber();
 				sessionobject.setExpirationTime(newTime);
 				String replacementmessage = request.getParameter("message");
 				sessionobject.setMessage(replacementmessage);
 			
 			}else if (param.equalsIgnoreCase(LOGOUT)){
-				System.out.println("Inside logout");
+				LOGGER.info("Inside logout");
 				sessionManager.deleteSession(sessionobject.getSessionId(), sessionTable);
 				newcookieAge = 0;
 			}else{
-				System.out.println("Shouldn't be here");
+				LOGGER.info("Shouldn't be here");
 			}
 			
 		}else{
 			
 			if( ! param.equalsIgnoreCase(LOGOUT)){
 				sessionobject = new SessionObject(MESSAGE, newTime, hostInfo);
-				System.out.println("Constructed new session object with session id : " 
+				LOGGER.info("Constructed new session object with session id : " 
 						+ sessionobject.getSessionId());
 			}
 		}
@@ -165,7 +168,7 @@ public class WebServer extends HttpServlet {
 			c.setMaxAge(newcookieAge);
 			response.addCookie(c);
 			
-			System.out.println("2 : " + Utils.generateDelimitedStringFromList(',', replicatedservers));
+			LOGGER.info("2 : " + Utils.generateDelimitedStringFromList(',', replicatedservers));
 			String retstring = sessionobject.getMessage() + "|" + sessionobject.getExpirationTime().toString() 
 					+ "|" + COOKIE_AGE + "|" + sessionobject.getVersion()
 					+ "|" + hostInfo.getIPAddress() + "|" + Utils.generateDelimitedStringFromList(',', replicatedservers)
@@ -174,7 +177,7 @@ public class WebServer extends HttpServlet {
 			
 			responsewriter.write(retstring);
 			
-			System.out.println(retstring);
+			LOGGER.info(retstring);
 		}
 
 }// end of doGet
