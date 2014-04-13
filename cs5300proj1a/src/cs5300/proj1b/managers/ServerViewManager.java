@@ -1,7 +1,6 @@
 package cs5300.proj1b.managers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -75,14 +74,14 @@ public class ServerViewManager {
 		LOGGER.info("Adding own IP to bootstrap server");
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
 		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
-		logger.info("Received servers : " + Utils.printStringList(servers));
+		LOGGER.info("Received servers : " + Utils.printStringList(servers));
 		Set<String> serverSet = new HashSet<String>(servers);
 		serverSet = removeFromView(serverSet, NULL_SERVER);
-		logger.info("Null removed servers : " + Utils.printStringList(servers));
+		LOGGER.info("Null removed servers : " + Utils.printStringList(servers));
 		serverSet = shrinkView(serverSet, VIEW_SIZE - 1);
-		logger.info("Shrunk servers : " + Utils.printStringList(servers));
+		LOGGER.info("Shrunk servers : " + Utils.printStringList(servers));
 		serverSet = addToView(serverSet, WebServer.hostInfo.getIPAddress());
-		logger.info("Own IP added servers : " + Utils.printStringList(servers));
+		LOGGER.info("Own IP added servers : " + Utils.printStringList(servers));
 		assert( serverSet.size() <= VIEW_SIZE);
 		
 		String write = Utils.generateDelimitedStringFromList(SIMPLE_DB_DELIMITER, new ArrayList<String>(serverSet));
