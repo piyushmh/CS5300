@@ -24,7 +24,7 @@ public class ServerViewManager {
 	public static final String NULL_SERVER = "0.0.0.0";
 	private ServerView serverView;
 
-	private Logger logger = Logger.getLogger(ServerViewManager.class.getName());
+	private Logger LOGGER = Logger.getLogger(ServerViewManager.class.getName());
 	
 	public ServerViewManager() {
 		this.serverView = new ServerView();
@@ -72,7 +72,7 @@ public class ServerViewManager {
 
 	public void addSelfToBootStrapServer(){
 
-		logger.info("Adding own IP to bootstrap server");
+		LOGGER.info("Adding own IP to bootstrap server");
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
 		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
 		logger.info("Received servers : " + Utils.printStringList(servers));
@@ -96,7 +96,7 @@ public class ServerViewManager {
 			List<String> viewarray = Utils.splitAndTrim(viewstring, REGEX_SIMPLE_DB_DELIMITER);
 			return new HashSet<String>(viewarray);
 		}else{
-			System.out.println("Inside ServerViewManager:getHostView : Operating getting "
+			LOGGER.info("Inside ServerViewManager:getHostView : Operating getting "
 					+ "host view failed, returning empty set");
 			return new HashSet<String>();
 		}
@@ -104,7 +104,7 @@ public class ServerViewManager {
 	
 	private void gossipViewWithHost(String hostname){
 		
-		logger.info("Gossiping with host : " + hostname);
+		LOGGER.info("Gossiping with host : " + hostname);
 		Set<String> viewSet = getHostView(hostname);
 		if( viewSet.size() == 0 ){
 			return;
@@ -118,13 +118,13 @@ public class ServerViewManager {
 		
 		Set<String> shrunkSet = shrinkView(combinedViewSet, VIEW_SIZE);
 		this.serverView.setServerSet(shrunkSet);
-		logger.info("Updating self view as :" + Utils.printStringSet(
+		LOGGER.info("Updating self view as :" + Utils.printStringSet(
 				this.serverView.getServerSet()));
 	}
 	
 	private void gossipWithBootStrapServer(){
 		
-		logger.info("Gossiping with boot strap server");
+		LOGGER.info("Gossiping with boot strap server");
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
 		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
 		Set<String> bootServerSet = new HashSet<String>(servers);
@@ -134,7 +134,7 @@ public class ServerViewManager {
 		combinedviewSet = shrinkView(combinedviewSet, VIEW_SIZE);
 		this.serverView.setServerSet(combinedviewSet);
 		
-		logger.info("Updating self view as :" + Utils.printStringSet(
+		LOGGER.info("Updating self view as :" + Utils.printStringSet(
 				this.serverView.getServerSet()));
 		
 		combinedviewSet = addToView(combinedviewSet, WebServer.hostInfo.getIPAddress());
@@ -151,7 +151,7 @@ public class ServerViewManager {
 	
 	public void initiateViewGossip(){
 		
-		logger.info("Initiating periodic view gossip");
+		LOGGER.info("Initiating periodic view gossip");
 		
 		int size = this.serverView.getServerSet().size();
 		int randomindex =  (int) (Math.random() * (size + 1) );

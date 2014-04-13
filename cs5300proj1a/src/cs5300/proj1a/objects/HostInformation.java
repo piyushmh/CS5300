@@ -7,10 +7,13 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.logging.Logger;
+import cs5300.proj1a.daemons.RPCServerInitializer;
 
 //Author - Piyush
 
 public class HostInformation {
+	private final static Logger LOGGER = Logger.getLogger(HostInformation.class.getName());
 
 	private String ipAddress = "";
 
@@ -30,7 +33,7 @@ public class HostInformation {
 		BufferedReader b = new BufferedReader(new InputStreamReader(s));
 		String line = b.readLine();
 		String [] lines = line.split(":");
-		System.out.println(lines[1].trim());
+		LOGGER.info(lines[1].trim());
 		this.ipAddress = lines[1].trim();
 		return;
 	}
@@ -51,7 +54,7 @@ public class HostInformation {
 					InetAddress addr = addresses.nextElement();
 					ip = addr.getHostAddress();
 					if( isValidIP4Address(ip)){
-						System.out.println(ip);
+						LOGGER.info(ip);
 						this.ipAddress = ip;
 						return;
 					}

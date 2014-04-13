@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
+import cs5300.proj1a.objects.HostInformation;
 import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
@@ -15,6 +16,8 @@ import java.util.logging.*;
 
 public class RPCCommunicationManager {
 
+	private final static Logger LOGGER = Logger.getLogger(RPCCommunicationManager.class.getName());
+	
 	private static String NETWORK_DELIMITER = "|";
 
 	private static String REGEX_NETWORK_DELIMITER = "\\|";
@@ -29,11 +32,10 @@ public class RPCCommunicationManager {
 
 	private static int CONFIRMATION_CODE = 400;
 
-	private Logger logger = Logger.getLogger(RPCCommunicationManager.class.getName());
 	
 	public String gossipViewWithHost(String server){
 		
-		logger.info("Inside RPC Communication Manager: Gossiping with host : " + server);
+		LOGGER.info("Inside RPC Communication Manager: Gossiping with host : " + server);
 		
 		String callId = UUID.randomUUID().toString(); 
 		String serverString = 
@@ -43,7 +45,7 @@ public class RPCCommunicationManager {
 		try {
 
 			reply = new RPCClient().callServer(server, RPC_SERVER_PORT, serverString, callId);	
-			System.out.println("String received from server : " + reply);
+			LOGGER.info("String received from server : " + reply);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -56,7 +58,7 @@ public class RPCCommunicationManager {
 			SessionObject object, 
 			String replicaserver){
 
-		System.out.println("Replicating session id : " + object.getSessionId() + 
+		LOGGER.info("Replicating session id : " + object.getSessionId() + 
 				" on server : " + replicaserver);
 
 		boolean retval = false;
@@ -72,14 +74,18 @@ public class RPCCommunicationManager {
 		try {
 
 			String reply = new RPCClient().callServer(replicaserver, RPC_SERVER_PORT, serverstring, callId);	
-			System.out.println("String received from server : " + reply);
+			LOGGER.info("String received from server : " + reply);
 			if( reply!= null){
 				String[] list = reply.split(REGEX_NETWORK_DELIMITER);
-				System.out.println(Utils.printStringList(Arrays.asList(list)));
-				if( 400 == Integer.parseInt(list[1].trim()));
-				retval = true;
+
+				LOGGER.info(Utils.printStringList(Arrays.asList(list)));
+
+				if( 400 == Integer.parseInt(list[1].trim())){
+					retval = true;
+				}
+				
 			}else{
-				System.out.println("Replication failed on server : " + replicaserver);
+				LOGGER.info("Replication failed on server : " + replicaserver);
 			}
 
 		} catch (IOException e) {
@@ -107,7 +113,7 @@ public class RPCCommunicationManager {
 				
 				String[] list = outputString.split(REGEX_NETWORK_DELIMITER);
 				
-				System.out.println("Inside session read : " + Utils.printStringList(Arrays.asList(list)));
+				LOGGER.info("Inside session read : " + Utils.printStringList(Arrays.asList(list)));
 				
 				if( Integer.parseInt(list[1].trim()) != -1){
 					
@@ -118,7 +124,7 @@ public class RPCCommunicationManager {
 					object.setMessage(list[2]);
 					object.setExpirationTime(Long.parseLong(list[3].trim()));
 				}else {
-					System.out.println("Inside session read : Invalid version number received from server");
+					LOGGER.info("Inside session read : Invalid version number received from server");
 				}
 			}
 		}catch(IOException e){
@@ -129,9 +135,11 @@ public class RPCCommunicationManager {
 
 	public String replyToClient( String s){
 
-		System.out.println("String received from client : " + s);
+		LOGGER.info("String received from client : " + s);
 		String[] list = s.split(REGEX_NETWORK_DELIMITER);
-		System.out.println(Utils.printStringList(Arrays.asList(list)));
+
+		LOGGER.info(Utils.printStringList(Arrays.asList(list)));
+		
 		String retvalString = list[0]; //return the same call id
 
 		int opcode = Integer.parseInt(list[1].trim());
@@ -172,7 +180,7 @@ public class RPCCommunicationManager {
 					ServerViewManager.NETWORK_VIEW_DELIMITER , new ArrayList<String>(selfviewSet));
  		}
 
-		System.out.println("String returning to client : " + retvalString);
+		LOGGER.info("String returning to client : " + retvalString);
 		return retvalString;
 	}
 }
