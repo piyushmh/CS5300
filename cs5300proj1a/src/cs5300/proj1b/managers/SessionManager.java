@@ -1,7 +1,6 @@
 package cs5300.proj1b.managers;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -14,7 +13,9 @@ import cs5300.proj1a.sessiontable.SessionTable;
 
 public class SessionManager {
 
-	private static int replicationFactor = 2;
+	public static int REPLICATION_FACTOR = 2;
+	
+	public static int DELTA_MILLI_SECONDS = 5 * 1000;
 
 	private Logger logger = Logger.getLogger(SessionManager.class.getName());
 
@@ -28,18 +29,18 @@ public class SessionManager {
 
 		logger.info("Fetching session for cookiecontent :"
 				+ cookiecontent);
-		
+
 		if( cookiecontent == null)
 			return null;
 
 		String[] contentList = cookiemanager.parseCookieContent(cookiecontent);
 		String sessionId = contentList[0];
 		int versionNum = -1;
-		
+
 		if( contentList.length > 1){
 			versionNum = Integer.parseInt(contentList[1].trim());
 		}
-		
+
 		ArrayList<String> replicatedServers = new ArrayList<String>();
 
 		for( int i = 2; i < contentList.length ; i++){
@@ -49,7 +50,7 @@ public class SessionManager {
 		SessionObject sessionObject = null; 
 		int servernumber = checkIfReplicatedOnCurrentHost(replicatedServers, hostInfo.getIPAddress());
 
-				if( servernumber != -1){
+		if( servernumber != -1){
 			sessionObject = sessionTable.getSession(sessionId, versionNum);
 		}
 
@@ -98,7 +99,7 @@ public class SessionManager {
 
 			if( rpcmanager.replicateSession(object, replica)){
 				replicatedServers.add(replica);
-				if( replicatedServers.size() == replicationFactor)
+				if( replicatedServers.size() == REPLICATION_FACTOR)
 					break;
 			}
 		}

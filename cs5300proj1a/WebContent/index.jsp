@@ -4,7 +4,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Project1b</title>
+<style type="text/css">
+p {color:blue}
+</style>
 </head>
 <body>
 
@@ -49,14 +52,17 @@ function populate(data){
 	}
 	
 	$("#servermessage").text(response[0].trim());
-	$("#cookiediscardtime").text(response[1]);
-	$("#cookieexptime").text(response[2]);
+	$("#cookiediscardtime").text(response[2]);
+	$("#cookieexptime").text(response[1]);
 	$("#serverid").text(response[4]);
 	var repservers = response[5].split(",");
 	$("#primaryhost").text(repservers[0]);
 	$("#secondaryhost").text(repservers[1]);
 	$("#serverview").text(response[6]);
-	$("#datafoundhost").text(response[7]);
+	if( response[7] == -1 || response[7] == 0)
+		$("#datafoundhost").text("Primary");
+	else
+		$("#datafoundhost").text("Secondary");
 	$("#cookieversionnumber").text(response[3]);
 
 }

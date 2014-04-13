@@ -2,6 +2,7 @@ package cs5300.proj1a.servelets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -29,7 +30,8 @@ import cs5300.proj1b.managers.SimpleDBInteractionManager;
  */
 @WebServlet("/SessionManager")
 public class WebServer extends HttpServlet {
-	private final static Logger LOGGER = Logger.getLogger(WebServer.class.getName());
+	
+	private Logger LOGGER = Logger.getLogger(WebServer.class.getName());
 	
 	private static final long serialVersionUID = 1L;
 
@@ -87,7 +89,7 @@ public class WebServer extends HttpServlet {
 		}
 		LOGGER.info("Size of the session table is :" + sessionTable.getSize());
 		LOGGER.info("Cookie content from the browser cookie is : " + cookiecontent);
-
+		LOGGER.info("Parameter received from the browser is :"  + param);
 		String servermessage = "";
 		long newTime = Utils.getCurrentTimeInMillis() + COOKIE_AGE * 1000;
 		int newcookieAge = COOKIE_AGE; 
@@ -168,9 +170,11 @@ public class WebServer extends HttpServlet {
 			c.setMaxAge(newcookieAge);
 			response.addCookie(c);
 			
-			LOGGER.info("2 : " + Utils.generateDelimitedStringFromList(',', replicatedservers));
-			String retstring = sessionobject.getMessage() + "|" + sessionobject.getExpirationTime().toString() 
-					+ "|" + COOKIE_AGE + "|" + sessionobject.getVersion()
+			LOGGER.info("Replicated Servers : " + Utils.generateDelimitedStringFromList(',', replicatedservers));
+			String retstring = sessionobject.getMessage() 
+					+ "|" + sessionobject.getExpirationTime().toString() 
+					+ "|" + new Date(sessionobject.getExpirationTimeMilliSecond()+ SessionManager.DELTA_MILLI_SECONDS ).toString() 
+					+ "|" + sessionobject.getVersion()
 					+ "|" + hostInfo.getIPAddress() + "|" + Utils.generateDelimitedStringFromList(',', replicatedservers)
 					+ "|" + Utils.generateDelimitedStringFromList(',', new ArrayList<String>(viewManager.getServerViewList())) 
 					+ "|" + servernum + "|" + servermessage;

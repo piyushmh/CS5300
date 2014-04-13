@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class GossipDaemonInitializer implements ServletContextListener{
 
-	private final static Logger LOGGER = Logger.getLogger(GossipDaemonInitializer.class.getName());
+	private Logger LOGGER = Logger.getLogger(GossipDaemonInitializer.class.getName());
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {

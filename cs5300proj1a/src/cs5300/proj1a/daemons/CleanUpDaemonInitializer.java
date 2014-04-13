@@ -10,7 +10,7 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class CleanUpDaemonInitializer implements ServletContextListener{
 
-	private final static Logger LOGGER = Logger.getLogger(CleanUpDaemonInitializer.class.getName());
+	private Logger LOGGER = Logger.getLogger(CleanUpDaemonInitializer.class.getName());
 	
 	private static int CLEAN_UP_DAEMON_FREQUENCY = 5*60*1000;
 	

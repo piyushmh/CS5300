@@ -11,7 +11,7 @@ import cs5300.proj1a.utils.Utils;
 
 public class CleanUpDaemon extends TimerTask {
 	
-	private final static Logger LOGGER = Logger.getLogger(CleanUpDaemon.class.getName());
+	private Logger LOGGER = Logger.getLogger(CleanUpDaemon.class.getName());
 			
 	@Override
 	public void run() {

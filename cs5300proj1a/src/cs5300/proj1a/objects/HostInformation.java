@@ -13,7 +13,8 @@ import cs5300.proj1a.daemons.RPCServerInitializer;
 //Author - Piyush
 
 public class HostInformation {
-	private final static Logger LOGGER = Logger.getLogger(HostInformation.class.getName());
+	
+	private Logger LOGGER = Logger.getLogger(HostInformation.class.getName());
 
 	private String ipAddress = "";
 

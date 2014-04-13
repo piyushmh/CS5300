@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
-import cs5300.proj1a.objects.HostInformation;
 import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;

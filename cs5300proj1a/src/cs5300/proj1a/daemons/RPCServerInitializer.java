@@ -10,7 +10,7 @@ import cs5300.proj1b.rpc.RPCServer;
 @WebListener
 public class RPCServerInitializer implements ServletContextListener{
 
-	private final static Logger LOGGER = Logger.getLogger(RPCServerInitializer.class.getName());
+	private Logger LOGGER = Logger.getLogger(RPCServerInitializer.class.getName());
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {

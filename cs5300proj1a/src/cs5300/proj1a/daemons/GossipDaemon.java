@@ -7,7 +7,7 @@ import cs5300.proj1a.servelets.WebServer;
 //Author - Piyush
 public class GossipDaemon implements Runnable{
 
-	private final static Logger LOGGER = Logger.getLogger(GossipDaemon.class.getName());
+	private Logger LOGGER = Logger.getLogger(GossipDaemon.class.getName());
 	
 	private static final int GOSSIP_INTERVAL_SEC = 60;
 	
