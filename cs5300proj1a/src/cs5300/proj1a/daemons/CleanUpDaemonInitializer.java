@@ -18,7 +18,8 @@ public class CleanUpDaemonInitializer implements ServletContextListener{
 	}
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		Timer time = new Timer();
+		
+		//Timer time = new Timer();
 		//CleanUpDaemon daemontask =  new CleanUpDaemon();
 		//time.schedule(daemontask, 0, CLEAN_UP_DAEMON_FREQUENCY);
 	}
