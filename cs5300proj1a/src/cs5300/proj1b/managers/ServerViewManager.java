@@ -10,7 +10,7 @@ public class ServerViewManager {
 	public ServerViewManager() {
 		super();
 		this.serverView = new HashSet<String>();
-		this.serverView.add("192.168.0.19");
+		this.serverView.add("192.168.0.15");
 	}
 	
 	public Set<String> getServerView(){

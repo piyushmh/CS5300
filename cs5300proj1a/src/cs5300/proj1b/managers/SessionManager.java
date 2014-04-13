@@ -39,17 +39,18 @@ public class SessionManager {
 		System.out.println("1. " + sessionId + " " + versionNum + " " + servernumber);
 
 		if( servernumber != -1){
-
 			sessionObject = sessionTable.getSession(sessionId, versionNum);
+		}
 
-		}else{
-
+		if( servernumber == -1 || sessionObject == null){		
 			for( int i = 0; i < replicatedServers.size(); i++){
-				SessionObject temp = rpcmanager.sessionRead(replicatedServers.get(i), sessionId, versionNum);
-				if( temp != null){
-					sessionObject = temp;
-					servernumber = i;
-					break;
+				if( ! replicatedServers.get(i).equals(hostInfo.getIPAddress())){
+					SessionObject temp = rpcmanager.sessionRead(replicatedServers.get(i), sessionId, versionNum);
+					if( temp != null){
+						sessionObject = temp;
+						servernumber = i;
+						break;
+					}
 				}
 			}
 		}

@@ -3,12 +3,11 @@ package cs5300.proj1b.managers;
 import java.io.IOException;
 import java.util.UUID;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
 import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
 import cs5300.proj1b.rpc.RPCClient;
+
 
 public class RPCCommunicationManager {
 
@@ -48,7 +47,7 @@ public class RPCCommunicationManager {
 			if( reply!= null){
 				String[] list = reply.split(REGEX_NETWORK_DELIMITER);
 				System.out.println(Utils.printStringList(list));
-				if( 400 == Integer.parseInt(list[1]));
+				if( 400 == Integer.parseInt(list[1].trim()));
 				retval = true;
 			}else{
 				System.out.println("Replication failed on server : " + replicaserver);
@@ -74,16 +73,23 @@ public class RPCCommunicationManager {
 			String outputString = new RPCClient().callServer(hostname, RPC_SERVER_PORT, send, callID);
 
 			if( outputString != null){
+				
 				//EXPECTING FORMAT - CALLID|VERSION|MESSAGE|EXPIRATIONDATE
+				
 				String[] list = outputString.split(REGEX_NETWORK_DELIMITER);
-				System.out.println(Utils.printStringList(list));
-				if( Integer.parseInt(list[1]) != -1){
+				
+				System.out.println("Inside session read : " + Utils.printStringList(list));
+				
+				if( Integer.parseInt(list[1].trim()) != -1){
+					
 					object = new SessionObject();
 					assert( version == Integer.parseInt(list[1]));
 					object.setVersion(version);
 					object.setSessionId(sessionid);
 					object.setMessage(list[2]);
 					object.setExpirationTime(Long.parseLong(list[3].trim()));
+				}else {
+					System.out.println("Inside session read : Invalid version number received from server");
 				}
 			}
 		}catch(IOException e){
@@ -106,7 +112,7 @@ public class RPCCommunicationManager {
 			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|VERSION
 
 			SessionObject object = WebServer.sessionTable.concurrentHashMap.get(list[2]);
-			if(object != null && (object.getVersion() == Integer.parseInt(list[3]))){
+			if(object != null && (object.getVersion() == Integer.parseInt(list[3].trim()))){
 				retvalString += NETWORK_DELIMITER + object.getVersion() + NETWORK_DELIMITER + object.getMessage()
 						+ NETWORK_DELIMITER + object.getExpirationTimeMilliSecond();
 			
