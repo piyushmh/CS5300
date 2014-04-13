@@ -6,7 +6,9 @@ import cs5300.proj1a.objects.SessionObject;
 
 public class CookieManager {
 	
-	private String COOKIE_DELIMITER = "_";
+	private String COOKIE_DELIMITER = "|";
+	
+	private String REGEX_COOKIE_DELIMETER = "\\|"; 
 	
 	/* Cookie contents
 	 * 
@@ -27,7 +29,7 @@ public class CookieManager {
 	
 	String[] parseCookieContent(String content){
 		
-		String [] list = content.split(COOKIE_DELIMITER);
+		String [] list = content.split(REGEX_COOKIE_DELIMETER);
 		return list;
 	}
 }
