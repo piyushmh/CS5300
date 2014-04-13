@@ -26,7 +26,12 @@ public class SessionManager {
 
 		String[] contentList = cookiemanager.parseCookieContent(cookiecontent);
 		String sessionId = contentList[0];
-		int versionNum = Integer.parseInt(contentList[1].trim());
+		int versionNum = -1;
+		
+		if( contentList.length > 1){
+			versionNum = Integer.parseInt(contentList[1].trim());
+		}
+		
 		ArrayList<String> replicatedServers = new ArrayList<String>();
 
 		for( int i = 2; i < contentList.length ; i++){
