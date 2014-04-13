@@ -148,8 +148,10 @@ public class ServerViewManager {
 		
 		System.out.println("Initiating periodic view gossip");
 		
-		int randomindex =  (int) (Math.random() * (VIEW_SIZE + 1) );
-		if( randomindex < VIEW_SIZE){
+		int size = this.serverView.getServerSet().size();
+		int randomindex =  (int) (Math.random() * (size + 1) );
+		
+		if( size > 0 && randomindex < VIEW_SIZE){
 			gossipViewWithHost(new ArrayList<String>(
 					this.serverView.getServerSet()).get(randomindex));
 		}else{

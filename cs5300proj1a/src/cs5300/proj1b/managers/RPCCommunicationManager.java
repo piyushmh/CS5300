@@ -9,7 +9,7 @@ import cs5300.proj1a.objects.SessionObject;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
 import cs5300.proj1b.rpc.RPCClient;
-
+import java.util.logging.*;
 
 public class RPCCommunicationManager {
 
@@ -27,10 +27,11 @@ public class RPCCommunicationManager {
 
 	private static int CONFIRMATION_CODE = 400;
 
+	private Logger logger = Logger.getLogger(RPCCommunicationManager.class.getName());
 	
 	public String gossipViewWithHost(String server){
 		
-		System.out.println("Inside RPC Communication Manager: Gossiping with host : " + server);
+		logger.info("Inside RPC Communication Manager: Gossiping with host : " + server);
 		
 		String callId = UUID.randomUUID().toString(); 
 		String serverString = 
