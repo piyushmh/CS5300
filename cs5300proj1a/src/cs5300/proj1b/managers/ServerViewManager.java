@@ -82,6 +82,7 @@ public class ServerViewManager {
 		LOGGER.info("Shrunk servers : " + Utils.printStringList(servers));
 		serverSet = addToView(serverSet, WebServer.hostInfo.getIPAddress());
 		LOGGER.info("Own IP added servers : " + Utils.printStringList(servers));
+		
 		assert( serverSet.size() <= VIEW_SIZE);
 		
 		String write = Utils.generateDelimitedStringFromList(SIMPLE_DB_DELIMITER, new ArrayList<String>(serverSet));
