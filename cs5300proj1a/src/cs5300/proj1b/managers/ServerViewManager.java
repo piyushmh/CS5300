@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import cs5300.proj1a.objects.HostInformation;
 import cs5300.proj1a.objects.ServerView;
 import cs5300.proj1a.servelets.WebServer;
 import cs5300.proj1a.utils.Utils;
@@ -40,20 +41,19 @@ public class ServerViewManager {
 	public Set<String> shrinkView(Set<String> s, int size){
 
 		List<String> list = new ArrayList<String>(s);
-		Collections.shuffle(list);
+		
 		if ( list.size() > size){
+			Collections.shuffle(list);
 			list = list.subList(0, size);
 		}
 		return new HashSet<String>(list);    
 	}
 
 	public Set<String> removeFromView(Set<String> s, String str){
-		Set<String> retSet = new HashSet<String>();
-		for (String server : s) {
-			if( ! server.equalsIgnoreCase(str))
-				retSet.add(server);
-		}
-		return retSet;
+		
+		//Set<String> retSet = new HashSet<String>();
+		s.remove(str);
+		return s;
 	}
 
 	public Set<String> addToView(Set<String> view, String server){
@@ -92,11 +92,15 @@ public class ServerViewManager {
 	private Set<String> getHostView(String hostname){
 		
 		String viewstring = WebServer.rpcManager.gossipViewWithHost(hostname);
+		
 		if( viewstring!= null){
-			List<String> viewarray = Utils.splitAndTrim(viewstring, REGEX_SIMPLE_DB_DELIMITER);
-			return new HashSet<String>(viewarray);
+			
+			LOGGER.info("View string received from host : " + viewstring);
+			List<String> viewList = Utils.splitAndTrim(viewstring, REGEX_NETWORK_VIEW_DELIMITER);
+			return new HashSet<String>(viewList);
+			
 		}else{
-			LOGGER.info("Inside ServerViewManager:getHostView : Operating getting "
+			LOGGER.info("Inside ServerViewManager:getHostView : Operation getting "
 					+ "host view failed, returning empty set");
 			return new HashSet<String>();
 		}
@@ -116,7 +120,16 @@ public class ServerViewManager {
 		combinedViewSet = removeFromView(
 				combinedViewSet, WebServer.hostInfo.getIPAddress());
 		
-		Set<String> shrunkSet = shrinkView(combinedViewSet, VIEW_SIZE);
+		Set<String> prunedCombinedViewSet = new HashSet<String>();
+		for (String s : combinedViewSet) {
+			if(HostInformation.isValidIP4Address(s)){
+				prunedCombinedViewSet.add(s);
+			}else{
+				LOGGER.info("Incorrect IP found, ignoring : " + s);
+			}
+		}
+		
+		Set<String> shrunkSet = shrinkView(prunedCombinedViewSet, VIEW_SIZE);
 		this.serverView.setServerSet(shrunkSet);
 		LOGGER.info("Updating self view as :" + Utils.printStringSet(
 				this.serverView.getServerSet()));
@@ -128,10 +141,25 @@ public class ServerViewManager {
 		String bootstrapcontentString  = WebServer.simpleDBManager.getValue();
 		List<String> servers = Utils.splitAndTrim(bootstrapcontentString, REGEX_SIMPLE_DB_DELIMITER);		
 		Set<String> bootServerSet = new HashSet<String>(servers);
+		LOGGER.info("Boot strap server set : " + Utils.printStringSet(bootServerSet));
+		LOGGER.info("Own IP address is :" + WebServer.hostInfo.getIPAddress());
 		bootServerSet = removeFromView(bootServerSet, WebServer.hostInfo.getIPAddress());
+		LOGGER.info("Boot strap server set after removing own IP: " + Utils.printStringSet(bootServerSet));
 		
 		Set<String> combinedviewSet = unionView(bootServerSet, this.serverView.getServerSet());
+		LOGGER.info("Combined server set : " + Utils.printStringSet(combinedviewSet));
 		combinedviewSet = shrinkView(combinedviewSet, VIEW_SIZE);
+		
+		Set<String> prunedCombinedViewSet = new HashSet<String>();
+		
+		for (String s : combinedviewSet) {
+			if( HostInformation.isValidIP4Address(s))
+				prunedCombinedViewSet.add(s);
+			else
+				LOGGER.info("Incorrect IP encountered : " + s);
+		}
+		
+		combinedviewSet = prunedCombinedViewSet;
 		this.serverView.setServerSet(combinedviewSet);
 		
 		LOGGER.info("Updating self view as :" + Utils.printStringSet(

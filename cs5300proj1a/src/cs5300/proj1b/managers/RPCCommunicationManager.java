@@ -3,6 +3,7 @@ package cs5300.proj1b.managers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.logging.*;
 public class RPCCommunicationManager {
 
 	private final static Logger LOGGER = Logger.getLogger(RPCCommunicationManager.class.getName());
-	
+
 	private static String NETWORK_DELIMITER = "|";
 
 	private static String REGEX_NETWORK_DELIMITER = "\\|";
@@ -26,33 +27,37 @@ public class RPCCommunicationManager {
 	private static int SESSION_READ_OPCODE = 1;
 
 	private static int SESSION_WRITE_OPCODE = 2;
-	
+
 	private static int VIEW_GOSSIP_OPCODE = 3;
 
 	private static int CONFIRMATION_CODE = 400;
 
-	
+
 	public String gossipViewWithHost(String server){
-		
+
 		LOGGER.info("Inside RPC Communication Manager: Gossiping with host : " + server);
-		
+
 		String callId = UUID.randomUUID().toString(); 
 		String serverString = 
-				callId + NETWORK_DELIMITER + VIEW_GOSSIP_OPCODE;
-		
+				callId + NETWORK_DELIMITER + VIEW_GOSSIP_OPCODE + NETWORK_DELIMITER ;
+
 		String reply = null;
 		try {
 
-			reply = new RPCClient().callServer(server, RPC_SERVER_PORT, serverString, callId);	
-			LOGGER.info("String received from server : " + reply);
-			
+			String networkreply = new RPCClient().callServer(server, RPC_SERVER_PORT, serverString, callId);	
+			LOGGER.info("String received from server : " + networkreply);
+			if( networkreply != null){
+				List<String> networkReplyList = Utils.splitAndTrim(networkreply, REGEX_NETWORK_DELIMITER);
+				reply = networkReplyList.get(1);
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return reply;
 	}
-	
+
 	public boolean replicateSession(
 			SessionObject object, 
 			String replicaserver){
@@ -68,7 +73,7 @@ public class RPCCommunicationManager {
 				object.getSessionId() + NETWORK_DELIMITER +
 				object.getMessage() + 	NETWORK_DELIMITER + 
 				object.getVersion() + 	NETWORK_DELIMITER + 
-				object.getExpirationTimeMilliSecond();
+				object.getExpirationTimeMilliSecond() ;
 
 		try {
 
@@ -82,7 +87,7 @@ public class RPCCommunicationManager {
 				if( 400 == Integer.parseInt(list[1].trim())){
 					retval = true;
 				}
-				
+
 			}else{
 				LOGGER.info("Replication failed on server : " + replicaserver);
 			}
@@ -107,15 +112,15 @@ public class RPCCommunicationManager {
 			String outputString = new RPCClient().callServer(hostname, RPC_SERVER_PORT, send, callID);
 
 			if( outputString != null){
-				
+
 				//EXPECTING FORMAT - CALLID|VERSION|MESSAGE|EXPIRATIONDATE
-				
+
 				String[] list = outputString.split(REGEX_NETWORK_DELIMITER);
-				
+
 				LOGGER.info("Inside session read : " + Utils.printStringList(Arrays.asList(list)));
-				
+
 				if( Integer.parseInt(list[1].trim()) != -1){
-					
+
 					object = new SessionObject();
 					assert( version == Integer.parseInt(list[1]));
 					object.setVersion(version);
@@ -135,26 +140,27 @@ public class RPCCommunicationManager {
 	public String replyToClient( String s){
 
 		LOGGER.info("String received from client : " + s);
-		String[] list = s.split(REGEX_NETWORK_DELIMITER);
+		List<String> list = Utils.splitAndTrim(s, REGEX_NETWORK_DELIMITER);
 
-		LOGGER.info(Utils.printStringList(Arrays.asList(list)));
-		
-		String retvalString = list[0]; //return the same call id
+		LOGGER.info(Utils.printStringList(list));
 
-		int opcode = Integer.parseInt(list[1].trim());
+		String retvalString = list.get(0); //return the same call id
+
+		int opcode = Integer.parseInt(list.get(1).trim());
 
 		if( opcode == SESSION_READ_OPCODE){
-			
-			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|VERSION
 
-			SessionObject object = WebServer.sessionTable.concurrentHashMap.get(list[2]);
-			if(object != null && (object.getVersion() == Integer.parseInt(list[3].trim()))){
+			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|VERSION|
+
+			SessionObject object = WebServer.sessionTable.concurrentHashMap.get(list.get(2));
+			if(object != null && (object.getVersion() == Integer.parseInt(list.get(3).trim()))){
 				retvalString += NETWORK_DELIMITER + object.getVersion() + NETWORK_DELIMITER + object.getMessage()
-						+ NETWORK_DELIMITER + object.getExpirationTimeMilliSecond();
-			
+						+ NETWORK_DELIMITER + object.getExpirationTimeMilliSecond() + NETWORK_DELIMITER;
+
 			}else{
-			
-				retvalString += NETWORK_DELIMITER + -1 + NETWORK_DELIMITER + "Dummy" + NETWORK_DELIMITER + -1;
+
+				retvalString += NETWORK_DELIMITER + -1 + NETWORK_DELIMITER + "Dummy" + 
+						NETWORK_DELIMITER + -1 + NETWORK_DELIMITER;
 			}
 
 		}else if ( opcode == SESSION_WRITE_OPCODE){
@@ -162,22 +168,23 @@ public class RPCCommunicationManager {
 			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|MESSAGE|VERSION|EXPIRATIONDATE
 
 			SessionObject sessionObject = new SessionObject();
-			sessionObject.setSessionId(list[2].trim());
-			sessionObject.setMessage(list[3].trim());
-			sessionObject.setVersion(Integer.parseInt(list[4].trim()));
-			sessionObject.setExpirationTime(Long.parseLong(list[5].trim()));
+			sessionObject.setSessionId(list.get(2).trim());
+			sessionObject.setMessage(list.get(3).trim());
+			sessionObject.setVersion(Integer.parseInt(list.get(4).trim()));
+			sessionObject.setExpirationTime(Long.parseLong(list.get(5).trim()));
 
 			WebServer.sessionManager.addSessionLocally(sessionObject, WebServer.sessionTable);
-			retvalString += NETWORK_DELIMITER + CONFIRMATION_CODE;
-		
+			retvalString += NETWORK_DELIMITER + CONFIRMATION_CODE + NETWORK_DELIMITER;
+
 		} else if( opcode == VIEW_GOSSIP_OPCODE){
-			
+
 			//EXPECTEDFORMAT = CALLID|OPCODE
-			
+
 			Set<String> selfviewSet = WebServer.viewManager.getServerViewSet();
 			retvalString += NETWORK_DELIMITER + Utils.generateDelimitedStringFromList(
-					ServerViewManager.NETWORK_VIEW_DELIMITER , new ArrayList<String>(selfviewSet));
- 		}
+					ServerViewManager.NETWORK_VIEW_DELIMITER , new ArrayList<String>(selfviewSet)) 
+					+ NETWORK_DELIMITER;
+		}
 
 		LOGGER.info("String returning to client : " + retvalString);
 		return retvalString;
