@@ -165,7 +165,7 @@ public class RPCCommunicationManager {
 
 		}else if ( opcode == SESSION_WRITE_OPCODE){
 
-			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|MESSAGE|VERSION|EXPIRATIONDATE
+			//EXPECTED FORMAT - CALLID|OPCODE|SESSIONID|MESSAGE|VERSION|EXPIRATIONDATE|
 
 			SessionObject sessionObject = new SessionObject();
 			sessionObject.setSessionId(list.get(2).trim());

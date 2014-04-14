@@ -74,6 +74,10 @@ public class HostInformation {
 
 	/*This is to prune IPv6 on local boxes, we are dealing with only ipv4*/
 	public static boolean isValidIP4Address(String ipAddress) {
+		
+		if( "0.0.0.0".equals(ipAddress.trim()))
+			return false;
+		
 		if (ipAddress.matches("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$")) {
 			String[] groups = ipAddress.split("\\.");
 

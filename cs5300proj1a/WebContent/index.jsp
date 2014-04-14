@@ -57,7 +57,8 @@ function populate(data){
 	$("#serverid").text(response[4]);
 	var repservers = response[5].split(",");
 	$("#primaryhost").text(repservers[0]);
-	$("#secondaryhost").text(repservers[1]);
+	var splicedrepservers = repservers.splice(1);
+	$("#secondaryhost").text(splicedrepservers);
 	$("#serverview").text(response[6]);
 	if( response[7] == -1 || response[7] == 0)
 		$("#datafoundhost").text("Primary");

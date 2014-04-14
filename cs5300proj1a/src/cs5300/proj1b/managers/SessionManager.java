@@ -13,7 +13,7 @@ import cs5300.proj1a.sessiontable.SessionTable;
 
 public class SessionManager {
 
-	public static int REPLICATION_FACTOR = 2;
+	public static int REPLICATION_FACTOR = 3;
 	
 	public static int DELTA_MILLI_SECONDS = 5 * 1000;
 
