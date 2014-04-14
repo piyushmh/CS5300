@@ -73,7 +73,7 @@ public class RPCCommunicationManager {
 				object.getSessionId() + NETWORK_DELIMITER +
 				object.getMessage() + 	NETWORK_DELIMITER + 
 				object.getVersion() + 	NETWORK_DELIMITER + 
-				object.getExpirationTimeMilliSecond() ;
+				object.getExpirationTimeMilliSecond()  + NETWORK_DELIMITER ;
 
 		try {
 
