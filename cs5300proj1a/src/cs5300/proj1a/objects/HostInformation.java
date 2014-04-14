@@ -8,6 +8,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
+
 import cs5300.proj1a.daemons.RPCServerInitializer;
 
 //Author - Piyush
@@ -21,7 +22,12 @@ public class HostInformation {
 	public String getIPAddress(){
 
 		if( "".equals(this.ipAddress)){
-			findLocalIPAdrress();
+			try {
+				findEC2IPAddress();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return this.ipAddress;
@@ -67,7 +73,7 @@ public class HostInformation {
 	}
 
 	/*This is to prune IPv6 on local boxes, we are dealing with only ipv4*/
-	private static boolean isValidIP4Address(String ipAddress) {
+	public static boolean isValidIP4Address(String ipAddress) {
 		if (ipAddress.matches("^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$")) {
 			String[] groups = ipAddress.split("\\.");
 
