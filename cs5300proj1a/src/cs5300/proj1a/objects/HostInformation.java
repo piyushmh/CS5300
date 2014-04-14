@@ -23,7 +23,7 @@ public class HostInformation {
 
 		if( "".equals(this.ipAddress)){
 			try {
-				findEC2IPAddress();
+				findLocalIPAdrress();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
