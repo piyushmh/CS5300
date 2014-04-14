@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 public class RPCClient {
 
 	private static final int MAX_PACKET_SIZE = 512;
-	
+
 	private static final int SOCKET_TIME_OUT_MS = 5 * 1000;
 
 	private Logger logger = Logger.getLogger(RPCClient.class.getName());
@@ -25,11 +25,11 @@ public class RPCClient {
 			int port, 
 			String data, 
 			String callId) throws IOException{
-		
+
 		DatagramSocket rpcSocket = new DatagramSocket(); 
 		rpcSocket.setSoTimeout(SOCKET_TIME_OUT_MS);
 		try {
-		
+
 			InetAddress IP = InetAddress.getByName(hostname);
 			byte[] outBuf = new byte[MAX_PACKET_SIZE];
 			outBuf = data.getBytes();
@@ -39,17 +39,17 @@ public class RPCClient {
 
 			byte [] inBuf = new byte[MAX_PACKET_SIZE];
 			DatagramPacket recvPkt = new DatagramPacket(inBuf, inBuf.length);
-			
+
 			do{	
 				recvPkt.setLength(inBuf.length);
 				rpcSocket.receive(recvPkt);
 			}while(verifyResponse(new String(inBuf),  callId));
-			
+
 			logger.info("String recieved from server : " + new String(inBuf));
 			return new String(inBuf);
-			
+
 		} catch (IOException e) {
-			
+
 			return null;
 			
 		}finally{

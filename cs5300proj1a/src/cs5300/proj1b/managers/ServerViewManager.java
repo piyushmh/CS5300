@@ -30,6 +30,10 @@ public class ServerViewManager {
 		this.serverView = new ServerView();
 	}
 
+	public boolean removeFromLocalView( String host){
+		return this.serverView.getServerSet().remove(host.trim());
+	}
+	
 	public Set<String> getServerViewSet(){
 		return this.serverView.getServerSet();
 	}
@@ -102,6 +106,11 @@ public class ServerViewManager {
 		}else{
 			LOGGER.info("Inside ServerViewManager:getHostView : Operation getting "
 					+ "host view failed, returning empty set");
+			
+			LOGGER.info("Removing host from view : " + hostname);
+			
+			WebServer.viewManager.removeFromLocalView(hostname);
+			
 			return new HashSet<String>();
 		}
 	}

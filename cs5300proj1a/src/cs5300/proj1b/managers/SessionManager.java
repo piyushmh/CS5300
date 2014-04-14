@@ -1,6 +1,7 @@
 package cs5300.proj1b.managers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -14,7 +15,7 @@ import cs5300.proj1a.sessiontable.SessionTable;
 public class SessionManager {
 
 	public static int REPLICATION_FACTOR = 3;
-	
+
 	public static int DELTA_MILLI_SECONDS = 5 * 1000;
 
 	private Logger logger = Logger.getLogger(SessionManager.class.getName());
@@ -91,17 +92,24 @@ public class SessionManager {
 
 		addSessionLocally(object, table); //store locally first
 
-		Set<String> view = viewmanager.getServerViewSet();
+		Set<String> view = new HashSet<String>(viewmanager.getServerViewSet());
 		ArrayList<String> replicatedServers = new ArrayList<String>();
+
 		replicatedServers.add(hostInfo.getIPAddress());
 
-		for (String replica : view) {
-
-			if( rpcmanager.replicateSession(object, replica)){
-				replicatedServers.add(replica);
-				if( replicatedServers.size() == REPLICATION_FACTOR)
-					break;
+		Set<String> failedServers = new HashSet<String>();
+		try{
+			for (String replica : view) {
+				if( rpcmanager.replicateSession(object, replica)){
+					replicatedServers.add(replica);
+					if( replicatedServers.size() == REPLICATION_FACTOR)
+						break;
+				}else{
+					failedServers.add(replica);
+				}
 			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 
 		logger.info("Replication successfully done on hosts :" + replicatedServers.size());		
