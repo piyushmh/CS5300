@@ -8,3 +8,5 @@ cs5300proj1a/src/AwsCredentials.properties
 # Package Files #
 *.war
 *.ear
+
+cs5300proj2-temp/*

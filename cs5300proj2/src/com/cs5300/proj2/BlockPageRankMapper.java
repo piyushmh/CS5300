@@ -5,10 +5,12 @@ import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.log4j.Logger;
 
 
 public class BlockPageRankMapper extends Mapper<LongWritable, Text, Text, Text>{
 	
+	Logger logger = Logger.getLogger(BlockPageRankMapper.class);
 	
 	protected void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
@@ -25,7 +27,6 @@ public class BlockPageRankMapper extends Mapper<LongWritable, Text, Text, Text>{
 		Integer blockid = lookupBlockID(nodeid);
 		String edgelist = ""; 
 		
-		
 		if( temp.length == 4){
 			edgelist = temp[3].trim();
 		}
@@ -38,7 +39,9 @@ public class BlockPageRankMapper extends Mapper<LongWritable, Text, Text, Text>{
 									" " + 
 									edgelist
 									);
-		context.write(mapperkey, mappervalue); //this is the old pagerank value and edge list
+		
+		//this is the old page rank value and edge list for reconstructing the graph
+		context.write(mapperkey, mappervalue); 
 		
 		
 		if( ! edgelist.equals("")){	

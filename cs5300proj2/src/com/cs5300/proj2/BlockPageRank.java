@@ -1,6 +1,5 @@
 package com.cs5300.proj2;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -15,7 +14,7 @@ public class BlockPageRank {
 	public static final int totalNodes = 685230;	// total # of nodes in the input set
 	public static final int totalBlocks = 68;	// total # of blocks
 	public static final int precision = 10000;	// this allows us to store the residual error value in the counter as a long
-	private static final Float thresholdError = 0.001f;	// the threshold to determine whether or not we have converged
+	private static final Double thresholdError = 0.001;	// the threshold to determine whether or not we have converged
 
 	public static void main(String[] args) throws Exception {
 
@@ -24,7 +23,7 @@ public class BlockPageRank {
 		int i = 0;
 		
 		
-		Float residualErrorAvg = 0.0f;
+		double residualErrorAvg = 0.0;
 
 		// iterate to convergence 
 		do {
@@ -42,7 +41,7 @@ public class BlockPageRank {
 			job.setOutputKeyClass(Text.class);
 			job.setOutputValueClass(Text.class);
 
-			// on the initial pass, use the preprocessed input file
+			// on the initial pass, use the pre-processed input file
 			// note that we use the default input format which is TextInputFormat (each record is a line of input)
 			if (i == 0) {
 				FileInputFormat.addInputPath(job, new Path(inputFile)); 	
@@ -57,7 +56,10 @@ public class BlockPageRank {
 			job.waitForCompletion(true);
 
 			// before starting the next pass, compute the avg residual error for this pass and print it out
-			residualErrorAvg = (float) job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).getValue() / precision  / totalBlocks;
+			residualErrorAvg = ((double) job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).getValue() 
+					/ Constants.RESIDUAL_OFFSET);
+			
+			residualErrorAvg = residualErrorAvg/ totalBlocks;
 			String residualErrorString = String.format("%.4f", residualErrorAvg);
 			System.out.println("Residual error for iteration " + i + ": " + residualErrorString);
 

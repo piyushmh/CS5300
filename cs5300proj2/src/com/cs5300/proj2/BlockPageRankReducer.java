@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.metrics.spi.NoEmitMetricsContext;
+import org.apache.log4j.Logger;
 
 import com.cs5300.proj2.BlockPageRank.ProjectCounters;
 
@@ -20,18 +21,24 @@ import com.cs5300.proj2.BlockPageRank.ProjectCounters;
  */
 public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
+	Logger logger = Logger.getLogger(BlockPageRankReducer.class);
 
-
-
+	//this is for storing the new page rank values
 	private HashMap<String, Double> newPR = new HashMap<String, Double>();
 
-	private HashMap<String, Node> nodeIdToNodeMap = new HashMap<String, Node>();	
+	//this is for storing the mapping from node id to node object
+	private HashMap<String, Node> nodeIdToNodeMap = new HashMap<String, Node>();
+
+	//this is the mapping from node in the block to incoming edges within the reducer block
 	private HashMap<String, ArrayList<String>> BE = new HashMap<String, ArrayList<String>>();
+
+	//this is the mapping from nodes in the block to incoming edges from other blocks
 	private HashMap<String, Double> BC = new HashMap<String, Double>();
 
+	private ArrayList<String> vList = new ArrayList<String>();
 
 	private double dampingFactor = 0.85;
-	private double randomJumpFactor = (1 - dampingFactor) / Constants.TOTAL_BLOCKS;
+	private double randomJumpFactor = (1.0 - dampingFactor) / Constants.TOTAL_NODES;
 	private int maxIterations = 5;
 	private Double threshold = 0.001; 
 
@@ -44,8 +51,9 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 		nodeIdToNodeMap.clear();
 		BE.clear();
 		BC.clear();
+		vList.clear();
 
-
+		Integer maxnode = 0;
 		Iterator<Text> iter = values.iterator();
 
 		while( iter.hasNext()){ //read all values one by one
@@ -58,7 +66,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 				Node node = new Node();
 				node.setNodeID(valuearray[1].trim());
 				node.setPageRank(Double.parseDouble(valuearray[2].trim()));
-
+				vList.add(valuearray[1].trim());
 				newPR.put(node.getNodeID(), node.getPageRank());
 
 				if( valuearray.length == 4){
@@ -67,8 +75,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 				}
 
 				nodeIdToNodeMap.put(node.getNodeID(), node);
-
-				//add code to add the max value
+				maxnode = Math.max(maxnode, Integer.parseInt(node.getNodeID()));
 
 			}else if ("BE".equals(valuearray[0].trim())){
 
@@ -90,13 +97,16 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 		}
 
+		assert(vList.size() == this.nodeIdToNodeMap.keySet().size());
+
 		double residualerroriteration  = 0.0;
 		for( int i = 0 ; i < maxIterations ; i++){
 
 			residualerroriteration = iterateBlockOnce();
 
-			if( residualerroriteration < threshold)
+			if( residualerroriteration < threshold){
 				break;
+			}
 		}
 
 
@@ -105,9 +115,11 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 			residualerror+= 
 					Math.abs((newPR.get(node) - this.nodeIdToNodeMap.get(node).getPageRank())) 
-					/ newPR.get(node); 
+					/ newPR.get(node);
+
 		}
 
+		residualerror = residualerror / this.nodeIdToNodeMap.keySet().size();
 
 		long residualLong = (long)residualerror * Constants.RESIDUAL_OFFSET;
 		context.getCounter(ProjectCounters.RESIDUAL_ERROR).increment(residualLong);
@@ -115,10 +127,14 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 		for( String node : this.nodeIdToNodeMap.keySet()){
 			String output = newPR.get(node) + " " + this.nodeIdToNodeMap.get(node)
 					.getDegrees() + " " + this.nodeIdToNodeMap.get(node).getEdgeList();
-			 
+
 			Text outputkey = new Text(node);
 			Text outputtext = new Text(output);
 			context.write(outputkey, outputtext);
+			if (node.equals(maxnode.toString())) {
+				System.out.println("Block:" + key + " node:" + node + " pageRank:" + 
+						newPR.get(node));
+			}
 		}
 
 		cleanup(context);
@@ -131,10 +147,9 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 		Set<String> nodeset = this.nodeIdToNodeMap.keySet();
 		double residualError = 0.0;
 
-
 		for (String node : nodeset) {
 
-			double oldpagerank = this.nodeIdToNodeMap.get(node).getPageRank();
+			double oldpagerank = this.newPR.get(node);
 			double newpagerank = 0.0;
 
 			if( BE.containsKey(node)){
@@ -158,6 +173,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 		residualError = residualError / nodeset.size();
 		return residualError;
+
 	}
 }
 
