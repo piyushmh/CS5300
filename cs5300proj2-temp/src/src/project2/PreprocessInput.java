@@ -1,4 +1,4 @@
-package com.cs5300.proj2;
+package src.project2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

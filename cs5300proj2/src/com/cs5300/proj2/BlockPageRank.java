@@ -8,9 +8,11 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class BlockPageRank {
 
+	/*This is the counter that we are using for calculating residual values*/
 	public static enum ProjectCounters {
 		RESIDUAL_ERROR
 	};
+	
 	public static final int totalNodes = 685230;	// total # of nodes in the input set
 	public static final int totalBlocks = 68;	// total # of blocks
 	public static final int precision = 10000;	// this allows us to store the residual error value in the counter as a long
@@ -18,10 +20,10 @@ public class BlockPageRank {
 
 	public static void main(String[] args) throws Exception {
 
-		String inputFile = "tmp/mapperinput.txt";
-		String outputPath = "tmp/final_output";
-		int i = 0;
+		String inputFile = "tmp/mapperinput.txt"; //this is the pruned edge set
+		String outputPath = "tmp/final_output"; //final output folder, this called by passed using command line as well
 		
+		int i = 0;
 		
 		double residualErrorAvg = 0.0;
 
@@ -42,7 +44,6 @@ public class BlockPageRank {
 			job.setOutputValueClass(Text.class);
 
 			// on the initial pass, use the pre-processed input file
-			// note that we use the default input format which is TextInputFormat (each record is a line of input)
 			if (i == 0) {
 				FileInputFormat.addInputPath(job, new Path(inputFile)); 	
 				// otherwise use the output of the last pass as our input
@@ -56,10 +57,10 @@ public class BlockPageRank {
 			job.waitForCompletion(true);
 
 			// before starting the next pass, compute the avg residual error for this pass and print it out
-			residualErrorAvg = ((double) job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).getValue() 
-					/ Constants.RESIDUAL_OFFSET);
+			residualErrorAvg = (double) job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).getValue(); 
+			residualErrorAvg = residualErrorAvg / Constants.RESIDUAL_OFFSET;
 			
-			residualErrorAvg = residualErrorAvg/ totalBlocks;
+			residualErrorAvg = residualErrorAvg/ totalBlocks; //take average across all blocks
 			String residualErrorString = String.format("%.4f", residualErrorAvg);
 			System.out.println("Residual error for iteration " + i + ": " + residualErrorString);
 

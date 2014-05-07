@@ -8,15 +8,14 @@ import java.util.Set;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.metrics.spi.NoEmitMetricsContext;
 import org.apache.log4j.Logger;
 
 import com.cs5300.proj2.BlockPageRank.ProjectCounters;
 
-
 /**
- * Run reducer for every block, Receives all messages mapped to a single blockID
- * @author kt466
+ * This is the reducer implementation for the blocked page rank algorithm
+ * 
+ * @author piyush
  *
  */
 public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
@@ -42,19 +41,21 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 	private int maxIterations = 5;
 	private Double threshold = 0.001; 
 
+	//this is called once per block id 
 	protected void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
 
 
-		//this is because the same reducer instance can be used for multiple keys
+		//this is because the same reducer instance can be used for multiple keys, so
+		//we must clear them before reading values
 		newPR.clear();
 		nodeIdToNodeMap.clear();
 		BE.clear();
 		BC.clear();
 		vList.clear();
-
-		Integer maxnode = 0;
-		Iterator<Text> iter = values.iterator();
+		
+		Integer maxnode = 0; //this is for keeping track of the max node in the block
+		Iterator<Text> iter = values.iterator(); 
 
 		while( iter.hasNext()){ //read all values one by one
 
@@ -63,6 +64,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 			if( "PR".equals(valuearray[0].trim())){
 
+				//format is PR NodeID Pagerank edgelist
 				Node node = new Node();
 				node.setNodeID(valuearray[1].trim());
 				node.setPageRank(Double.parseDouble(valuearray[2].trim()));
@@ -79,6 +81,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 			}else if ("BE".equals(valuearray[0].trim())){
 
+				//format is BE edge node 
 				if( ! BE.containsKey(valuearray[2].trim())){
 					BE.put(valuearray[2].trim(), new ArrayList<String>());
 				}
@@ -87,11 +90,13 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 			}else if ("BC".equals(valuearray[0].trim())){
 
+				//format is BC edge Node EdgePagerank
 				if ( ! BC.containsKey(valuearray[2].trim())){
 					BC.put(valuearray[2].trim(), 0.0);
 				}
 
-				double tempVal =  BC.get(valuearray[2].trim()) + Double.parseDouble(valuearray[3].trim()) ; 
+				double tempVal =  BC.get(valuearray[2].trim()) + 
+						Double.parseDouble(valuearray[3].trim()) ; 
 				BC.put(valuearray[2].trim(), tempVal);
 			}
 
@@ -132,8 +137,8 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 			Text outputtext = new Text(output);
 			context.write(outputkey, outputtext);
 			if (node.equals(maxnode.toString())) {
-				System.out.println("Block:" + key + " node:" + node + " pageRank:" + 
-						newPR.get(node));
+				//System.out.println("Block:" + key + " node:" + node + " pageRank:" + 
+				//		newPR.get(node));
 			}
 		}
 
@@ -147,6 +152,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 		Set<String> nodeset = this.nodeIdToNodeMap.keySet();
 		double residualError = 0.0;
 
+		HashMap<String, Double> tempmap = new HashMap<String, Double>();
 		for (String node : nodeset) {
 
 			double oldpagerank = this.newPR.get(node);
@@ -156,7 +162,7 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 				ArrayList<String> edgelist = BE.get(node);
 
 				for (String edge: edgelist) {
-					newpagerank += ( newPR.get(edge) / this.nodeIdToNodeMap.get(edge).getDegrees());
+					newpagerank += ( this.newPR.get(edge) / this.nodeIdToNodeMap.get(edge).getDegrees());
 				}
 			}
 
@@ -167,36 +173,57 @@ public class BlockPageRankReducer extends Reducer<Text, Text, Text, Text> {
 
 			newpagerank = (newpagerank* dampingFactor) + randomJumpFactor;
 
-			newPR.put(node, newpagerank);
+			//newPR.put(node, newpagerank);
+			tempmap.put(node, newpagerank);
 			residualError += Math.abs(newpagerank - oldpagerank) / newpagerank;
 		}
 
+		this.newPR = tempmap;
 		residualError = residualError / nodeset.size();
 		return residualError;
 
 	}
+	
+	protected double IterateBlockOnce() {
+		// used to iterate through the BE list of edges
+		ArrayList<String> uList = new ArrayList<String>();
+		// npr = current PageRank value of Node v
+		double npr = 0.0f;
+		// r = sum of PR[u]/deg[u] for boundary nodes pointing to v
+		double r = 0.0f;
+		// resErr = the avg residual error for this iteration
+		double resErr = 0.0f;
+
+		for (String v : vList) {
+			npr = 0.0f;
+			double prevPR = newPR.get(v);
+
+			// calculate newPR using PR data from any BE nodes for this node
+			if (BE.containsKey(v)) {
+				uList = BE.get(v);
+				for (String u : uList) {
+					// npr += PR[u] / deg(u);
+					Node uNode = this.nodeIdToNodeMap.get(u);
+					npr += (newPR.get(u) / uNode.getDegrees());
+				}
+			}
+
+			// add on any PR from nodes outside the block (BC)
+			if (BC.containsKey(v)) {
+				r = BC.get(v);
+				npr += r;
+			}
+
+	        //NPR[v] = d*NPR[v] + (1-d)/N;
+			npr = (dampingFactor * npr) + randomJumpFactor;
+			// update the global newPR map
+			newPR.put(v, npr);
+			// track the sum of the residual errors
+			resErr += Math.abs(prevPR - npr) / npr;
+		}
+		// calculate the average residual error and return it
+		resErr = resErr / vList.size();
+		return resErr;
+	}
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
