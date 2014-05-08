@@ -115,7 +115,9 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 		
 		// add the residual error to the counter that is tracking the overall sum (must be expressed as a long value)
 		long residualAsLong = (long) Math.floor(residualError * PageRankBlock.precision);
+		long numberOfIterationgs = (long) (i*PageRankBlock.precision);
 		context.getCounter(PageRankBlock.ProjectCounters.RESIDUAL_ERROR).increment(residualAsLong);
+		context.getCounter(PageRankBlock.ProjectCounters.AVERAGE_ITERATIONS).increment(numberOfIterationgs);
 		
 		// output should be 
 		//	key:nodeID (for this node)

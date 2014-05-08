@@ -23,7 +23,8 @@ public class PageRankBlock {
 	
 	// use a hadoop counter to track the total residual error so we can compute the average at the end
 	public static enum ProjectCounters {
-	    RESIDUAL_ERROR
+	    RESIDUAL_ERROR,
+	    AVERAGE_ITERATIONS
 	};
 	public static final int totalNodes = 685230;	// total # of nodes in the input set
 	public static final int totalBlocks = 68;	// total # of blocks
@@ -36,6 +37,7 @@ public class PageRankBlock {
 		String outputPath = "tmp/tmpoutput";
 		int i = 0;
 		Float residualErrorAvg = 0.0f;
+		Float averageIterations = 0.0f;
 		
 		// iterate to convergence 
         do {
@@ -66,13 +68,18 @@ public class PageRankBlock {
             // execute the job and wait for completion before starting the next pass
             job.waitForCompletion(true);
             
-            // before starting the next pass, compute the avg residual error for this pass and print it out
+            // before starting the next pass, compute the avg residual error and average iterations for this pass and print it out
             residualErrorAvg = (float) job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).getValue() / precision  / totalBlocks;
             String residualErrorString = String.format("%.4f", residualErrorAvg);
             System.out.println("Residual error for iteration " + i + ": " + residualErrorString);
             
+            averageIterations = (float) job.getCounters().findCounter(ProjectCounters.AVERAGE_ITERATIONS).getValue() / precision / totalBlocks;
+            String averageIterationsString = String.format("%4f", averageIterations);
+            System.out.println("Average number of in block iterations for interation " + i + ": "  + averageIterationsString);
+            
             // reset the counter for the next round
             job.getCounters().findCounter(ProjectCounters.RESIDUAL_ERROR).setValue(0L);
+            job.getCounters().findCounter(ProjectCounters.AVERAGE_ITERATIONS).setValue(0L);
             i++;
         } while (residualErrorAvg > thresholdError);
         

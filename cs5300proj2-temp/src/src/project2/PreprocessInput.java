@@ -36,7 +36,7 @@ public class PreprocessInput {
 			//System.out.println(java.lang.Runtime.getRuntime().maxMemory()); 
 			//746
 			init_constant(984);
-			//createFilteredEdgesFile("tmp/edges.txt", "tmp/randomedgesample.txt");
+			createFilteredEdgesFile("tmp/edges.txt", "tmp/randomedgesample.txt");
 			createPreprocessedInputFile("tmp/randomedgesample.txt", "tmp/new_mapperinput.txt");
 			
 		}catch(Exception e){
