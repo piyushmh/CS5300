@@ -124,7 +124,7 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 			Text outputKey = new Text(v);
 			context.write(outputKey, outputText);
 			if (v.equals(maxNode.toString())) {
-				System.out.println("Block:" + key + " node:" + v + " pageRank:" + newPR.get(v));
+				System.out.println("Block:" + key + " | node:" + v + " | pageRank:" + newPR.get(v));
 			}
 		}
 			

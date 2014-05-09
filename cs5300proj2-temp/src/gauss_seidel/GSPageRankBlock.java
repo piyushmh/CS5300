@@ -9,17 +9,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 // blocked version of pageRank calculations using MapReduce
 public class GSPageRankBlock {
-	/*
-	 * There is a pre-processed file called Preprocess_76.txt made by a Python Script that Matthew did that rejects 
-	 * 0.998754% of the entries in edges.txt.
-	 * fromNetID = 0.76
-	 * rejectMin = 0.99 * fromNetID;
-	 * rejectLimit = rejectMin + 0.01;
-	 * 
-	 * Reject Min: 0.752400
-	 * Reject Limit: 0.762400
-	 */
-	
+
 	// use a hadoop counter to track the total residual error so we can compute the average at the end
 	public static enum ProjectCounters {
 	    RESIDUAL_ERROR,
