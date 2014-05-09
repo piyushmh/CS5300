@@ -1,10 +1,10 @@
-package randomblock;
+package gauss_seidel;
 
 import java.io.IOException;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 
-public class PageRankBlockMapper extends Mapper<LongWritable, Text, Text, Text> {
+public class GSPageRankBlockMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 	protected void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {

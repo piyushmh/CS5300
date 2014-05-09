@@ -1,4 +1,4 @@
-package jacobi;
+package gauss_seidel;
 
 import java.io.IOException;
 import java.util.*;
@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.*;
 import preprocess.NodeData;
 
 
-public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
+public class GSPageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 
 	private HashMap<String, Double> newPR = new HashMap<String, Double>();
 	private HashMap<String, ArrayList<String>> BE = new HashMap<String, ArrayList<String>>();
@@ -16,7 +16,7 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 	private HashMap<String, NodeData> nodeDataMap = new HashMap<String, NodeData>();
 	private ArrayList<String> vList = new ArrayList<String>();
 	private Double dampingFactor = (double) 0.85;
-	private Double randomJumpFactor = (1 - dampingFactor) / PageRankBlock.totalNodes;
+	private Double randomJumpFactor = (1 - dampingFactor) / GSPageRankBlock.totalNodes;
 	//private int maxIterations = 5;
 	private Double threshold = 0.001;
 	
@@ -108,11 +108,11 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 		//System.out.println("Block " + key + " overall resError for iteration: " + residualError);
 		
 		// add the residual error to the counter that is tracking the overall sum (must be expressed as a long value)
-		long residualAsLong = (long) Math.floor(residualError * PageRankBlock.precision);
+		long residualAsLong = (long) Math.floor(residualError * GSPageRankBlock.precision);
 		long numberOfIterations = (long) ( i);
-		context.getCounter(PageRankBlock.ProjectCounters.RESIDUAL_ERROR).increment(residualAsLong);
+		context.getCounter(GSPageRankBlock.ProjectCounters.RESIDUAL_ERROR).increment(residualAsLong);
 		
-		context.getCounter(PageRankBlock.ProjectCounters.AVERAGE_ITERATIONS).increment(numberOfIterations);
+		context.getCounter(GSPageRankBlock.ProjectCounters.AVERAGE_ITERATIONS).increment(numberOfIterations);
 		
 		// output should be 
 		//	key:nodeID (for this node)
@@ -149,7 +149,7 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 		// resErr = the avg residual error for this iteration
 		double resErr = 0.0;
 		
-		HashMap<String, Double> tempmap = new HashMap<String, Double>();
+		//HashMap<String, Double> tempmap = new HashMap<String, Double>();
 		for (String v : vList) {
 			npr = 0.0f;
 			double prevPR = newPR.get(v);
@@ -173,13 +173,13 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 	        //NPR[v] = d*NPR[v] + (1-d)/N;
 			npr = (dampingFactor * npr) + randomJumpFactor;
 			// update the global newPR map
-			tempmap.put(v, npr);
-			//newPR.put(v, npr);
+			//tempmap.put(v, npr);
+			newPR.put(v, npr);
 			// track the sum of the residual errors
 			resErr += Math.abs(prevPR - npr) / npr;
 		}
 		// calculate the average residual error and return it
-		newPR = tempmap;
+		//newPR = tempmap;
 		resErr = resErr / vList.size();
 		return resErr;
 	}

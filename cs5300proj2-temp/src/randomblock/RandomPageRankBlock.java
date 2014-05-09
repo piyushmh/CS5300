@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 
 // blocked version of pageRank calculations using MapReduce
-public class PageRankBlock {
+public class RandomPageRankBlock {
 	/*
 	 * There is a pre-processed file called Preprocess_76.txt made by a Python Script that Matthew did that rejects 
 	 * 0.998754% of the entries in edges.txt.
@@ -46,8 +46,8 @@ public class PageRankBlock {
             job.setJarByClass(jacobi.PageRankBlock.class);
 
             // Set Mapper and Reducer class
-            job.setMapperClass(jacobi.PageRankBlockMapper.class);
-            job.setReducerClass(jacobi.PageRankBlockReducer.class);
+            job.setMapperClass(randomblock.RandomPageRankBlockMapper.class);
+            job.setReducerClass(randomblock.RandomPageRankBlockReducer.class);
             
             // set the classes for output key and value
             job.setOutputKeyClass(Text.class);

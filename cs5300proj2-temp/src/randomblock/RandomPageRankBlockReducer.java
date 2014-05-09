@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.*;
 import preprocess.NodeData;
 
 
-public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
+public class RandomPageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 
 	private HashMap<String, Double> newPR = new HashMap<String, Double>();
 	private HashMap<String, ArrayList<String>> BE = new HashMap<String, ArrayList<String>>();
@@ -16,7 +16,7 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 	private HashMap<String, NodeData> nodeDataMap = new HashMap<String, NodeData>();
 	private ArrayList<String> vList = new ArrayList<String>();
 	private Double dampingFactor = (double) 0.85;
-	private Double randomJumpFactor = (1 - dampingFactor) / PageRankBlock.totalNodes;
+	private Double randomJumpFactor = (1 - dampingFactor) / RandomPageRankBlock.totalNodes;
 	//private int maxIterations = 5;
 	private Double threshold = 0.001;
 	
@@ -108,11 +108,11 @@ public class PageRankBlockReducer extends Reducer<Text, Text, Text, Text> {
 		//System.out.println("Block " + key + " overall resError for iteration: " + residualError);
 		
 		// add the residual error to the counter that is tracking the overall sum (must be expressed as a long value)
-		long residualAsLong = (long) Math.floor(residualError * PageRankBlock.precision);
+		long residualAsLong = (long) Math.floor(residualError * RandomPageRankBlock.precision);
 		long numberOfIterations = (long) ( i);
-		context.getCounter(PageRankBlock.ProjectCounters.RESIDUAL_ERROR).increment(residualAsLong);
+		context.getCounter(RandomPageRankBlock.ProjectCounters.RESIDUAL_ERROR).increment(residualAsLong);
 		
-		context.getCounter(PageRankBlock.ProjectCounters.AVERAGE_ITERATIONS).increment(numberOfIterations);
+		context.getCounter(RandomPageRankBlock.ProjectCounters.AVERAGE_ITERATIONS).increment(numberOfIterations);
 		
 		// output should be 
 		//	key:nodeID (for this node)
